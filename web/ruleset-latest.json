@@ -1,0 +1,560 @@
+{
+  "schoolYear": "2026-27",
+  "sourceVersion": "2026-27-v1",
+  "lastUpdated": "2026-05-23",
+  "disclaimer": "Estimates only. Confirm against the official Purchasing Guide and Family Handbook for your scholarship.",
+  "sources": [
+    "FES-UA Purchasing Guide (July 1, 2025), Florida Center for Students with Unique Abilities / UCF",
+    "PEP Purchasing Guide (Effective April 2026), Step Up For Students",
+    "FTC/FES-EO Purchasing Guide (Effective Summer 2025), Step Up For Students"
+  ],
+  "deadlines": {
+    "spendWindowStart": "--07-01",
+    "spendWindowEnd": "--06-30",
+    "reimbursementSubmissionDeadline": "--07-31",
+    "preAuthDeadline": "--05-29",
+    "reviewDaysMax": 60,
+    "disbursementSchedule": {
+      "fesUA": "quarterly",
+      "fesEO": "quarterly",
+      "pep":   "monthly"
+    }
+  },
+  "globalRules": {
+    "deviceReplacementYears": 2,
+    "peripheralPreAuthOver": 50.00,
+    "balanceCapNoNewFundingFESUA": 50000.00,
+    "frequencyRuleCrossesProgramSwitches": true,
+    "stepUpSupportPhone": "(877) 735-7837"
+  },
+  "categories": [
+    {
+      "key": "curriculum_materials",
+      "displayName": "Curriculum & Instructional Materials",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["curriculum", "workbook", "textbook", "lesson", "instructional", "course material"],
+      "ineligibleKeywords": [],
+      "requiresPreAuthIfNotPubliclyAvailable": true,
+      "sourceCitation": "All three Purchasing Guides — Curriculum & Curriculum Materials"
+    },
+    {
+      "key": "books",
+      "displayName": "Books",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["textbook"],
+      "phrasalKeywords": ["book"],
+      "ineligibleKeywords": [],
+      "notes": "Books are neither capped nor frequency-limited. Two copies of a book are permitted.",
+      "sourceCitation": "All three Purchasing Guides — Books"
+    },
+    {
+      "key": "device",
+      "displayName": "Digital Device (laptop / tablet / e-reader / phone / smartwatch)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["laptop", "chromebook", "tablet", "ipad", "e-reader", "ereader", "desktop", "computer", "cellular phone", "cell phone", "smartphone", "smart watch", "smartwatch"],
+      "ineligibleKeywords": [],
+      "requiresPreAuthIfWithinDeviceWindow": true,
+      "frequencyYears": 2,
+      "ineligibleForProgram": {
+        "pep":   "Digital devices (laptop, tablet, Chromebook, etc.) are explicitly prohibited under PEP. Pre-authorization will not be accepted for prohibited items.",
+        "fesEO": "Digital devices (laptop, tablet, Chromebook, etc.) are explicitly prohibited under FES-EO. Tuition and on-campus instruction are the primary uses."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Digital Devices (page 4); PEP & FES-EO Appendix A — Prohibited"
+    },
+    {
+      "key": "device_peripheral",
+      "displayName": "Digital Periphery (keyboard / mouse / monitor / printer / etc.)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["keyboard", "mouse", "trackball", "monitor", "printer", "speaker", "headset", "headphone", "external drive", "flash drive", "scanner", "digital pencil", "vr headset", "ar headset", "wi-fi router", "wifi router", "modem", "extender"],
+      "ineligibleKeywords": [],
+      "requiresPreAuthIfWithinDeviceWindow": true,
+      "frequencyYears": 2,
+      "needsPreAuthIfPeripheralOver": 50.00,
+      "ineligibleForProgram": {
+        "pep":   "Periphery devices are explicitly prohibited under PEP (except a Wi-Fi router rented from the ISP and billed with a monthly internet service).",
+        "fesEO": "Periphery devices are explicitly prohibited under FES-EO (except a Wi-Fi router rented from the ISP and billed with a monthly internet service)."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Digital Periphery Devices (page 4); PEP & FES-EO Appendix A"
+    },
+    {
+      "key": "assistive_tech",
+      "displayName": "Assistive Technology (braille, AAC, hearing aids, FM, screen readers, prescription eyeglasses)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["braille", "fm system", "hearing aid", "augmentative communication", "proloquo2go", "screen reader", "screen magnifier", "sip-and-puff", "smart board", "text-to-speech", "tts", "speech synthesizer", "tty", "tdd", "vibroacoustic", "talking word processor", "voice recognition"],
+      "ineligibleKeywords": [],
+      "ineligibleForProgram": {
+        "pep":   "Assistive technology devices are not enumerated as eligible under PEP. Submit a pre-authorization request.",
+        "fesEO": "Assistive technology devices are not enumerated as eligible under FES-EO. Submit a pre-authorization request."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Assistive Technology Devices (page 5)"
+    },
+    {
+      "key": "prescription_eyeglasses_pep",
+      "displayName": "Prescription Eyeglasses (PEP — one pair per year)",
+      "programs": ["pep"],
+      "eligibility": "eligible",
+      "keywords": ["prescription eyeglasses", "rx glasses"],
+      "ineligibleKeywords": ["non-prescription", "prescription sunglasses"],
+      "frequencyYears": 1,
+      "ineligibleForProgram": {
+        "fesEO": "Prescription eyeglasses for PEP — handled under FES-UA Assistive Technology for FES-UA students; otherwise pre-auth.",
+        "fesUA": "Use the Assistive Technology category for FES-UA prescription eyeglasses."
+      },
+      "sourceCitation": "PEP Purchasing Guide — School Supplies (one per year)"
+    },
+    {
+      "key": "internet_subscription",
+      "displayName": "In-home Internet / Streaming (age-appropriate)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["internet", "wifi", "wi-fi", "broadband", "streaming"],
+      "ineligibleKeywords": ["business internet", "starlink rv", "starlink mobile"],
+      "notes": "Must be billed to the Florida residential address on the student's scholarship application. Not pro-rated for family use.",
+      "sourceCitation": "All three Purchasing Guides — Internet Resources"
+    },
+    {
+      "key": "digital_subscription",
+      "displayName": "Educational Software / Subscription (single-user)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["microsoft office", "office 365", "adobe", "quickbooks", "lexisnexis", "graphics software", "magazine subscription", "newspaper subscription"],
+      "ineligibleKeywords": ["family plan", "multi-user", "in-game purchase", "gaming subscription"],
+      "notes": "Single-user pricing only. Multi-user is pro-rated. PEP/FES-EO additionally prohibit live TV, social media (except LinkedIn Learning for Students), and family/multi-user subscriptions.",
+      "sourceCitation": "All three Purchasing Guides — Educational Software & Subscriptions"
+    },
+    {
+      "key": "online_course_recorded",
+      "displayName": "Self-paced Pre-recorded Online Course",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["self-paced", "pre-recorded", "outschool", "k12 online", "khan academy", "coursera"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "PEP Purchasing Guide — Curriculum & Curriculum Materials (page 15); FES-UA Tuition section"
+    },
+    {
+      "key": "online_course_live",
+      "displayName": "Live / Synchronous Online Instruction",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["live online", "synchronous", "zoom class", "live instruction", "live online course"],
+      "ineligibleKeywords": [],
+      "notes": "PEP funds may NOT be used for full-time online instruction. Live online instruction for PEP must go through an approved online/virtual provider tuition category, not the curriculum category.",
+      "requiresApprovedProvider": true,
+      "sourceCitation": "PEP Purchasing Guide — Curriculum, Tuition at Approved Online/Virtual Provider"
+    },
+    {
+      "key": "tutoring_part_time",
+      "displayName": "Part-Time Tutoring",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["tutor", "tutoring"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "requiresProviderCredentials": true,
+      "providerCredentialOptions": [
+        "Valid Florida educator's certificate",
+        "Valid professional teaching certificate from another state",
+        "Bachelor's or graduate degree in subject area",
+        "Certified by a recognized research-based program (Barton, Orton-Gillingham, Wilson, MACTE)",
+        "Certified by NBPTS or ABCTE",
+        "FTCE score report (≤10 years old)",
+        "Valid Statement of Status (SOE) for Professional Certificate",
+        "Form from Florida school district verifying subject competency",
+        "Minimum 3 years documented experience in subject"
+      ],
+      "sourceCitation": "All three Guides — Part-Time Tutoring & Choice Navigator Services"
+    },
+    {
+      "key": "tutoring_full_time",
+      "displayName": "Full-Time Private Tutoring (Florida certified teacher)",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["full-time tutor", "full time tutoring", "private tutor"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "requiresProviderCredentials": true,
+      "requiresFloridaTeacherCertificate": true,
+      "notes": "K-3 = 720 hrs/yr, 4-12 = 900 hrs/yr. Tutor must file W-9 annually with the SFO. Max 5 students (or 25 in qualifying facility).",
+      "ineligibleForProgram": {
+        "fesEO": "FES-EO students must be enrolled full-time at an eligible private school; full-time private tutoring isn't applicable."
+      },
+      "sourceCitation": "FES-UA Guide page 17; PEP Guide page 18"
+    },
+    {
+      "key": "specialized_therapy",
+      "displayName": "Specialized Therapy (ABA / Speech / OT / PT / Listening-Spoken / Psych / Vision)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["aba", "applied behavior analysis", "rbt", "bcba", "speech-language", "slp", "occupational therapy", "physical therapy", "counseling", "psychotherapy", "vision therapy", "listening and spoken language"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "requiresProviderCredentials": true,
+      "requiresFloridaLicensedProvider": true,
+      "providerCredentialOptions": [
+        "Florida Department of Health license",
+        "Agency for Persons with Disabilities (APD) Waiver Provider",
+        "Specialized Instructional Services (SIS) Provider via Office of Early Learning",
+        "Board Certified Behavior Analyst (BCBA) — required for ABA",
+        "Registered Behavior Technician (RBT) under BCBA supervision",
+        "Florida-licensed Speech-Language Pathologist (s. 468.1125)",
+        "Florida-licensed Occupational Therapist (s. 468.203)",
+        "Florida-licensed Physical Therapist (s. 486.021)",
+        "Licensed Psychologist / School Psychologist / Mental Health Counselor / Marriage & Family Therapist / Clinical Social Worker",
+        "Licensed Optometrist (vision therapy)",
+        "Out-of-state psychologists credentialed through PSYPACT"
+      ],
+      "notes": "Online delivery eligible. Services may be delivered outside Florida by credentialed providers.",
+      "ineligibleForProgram": {
+        "pep":   "Specialized therapies (ABA, speech, OT, PT, etc.) are not eligible under PEP — they are FES-UA-only.",
+        "fesEO": "Specialized therapies (ABA, speech, OT, PT, etc.) are not eligible under FES-EO — they are FES-UA-only."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Specialized Services (page 12-13)"
+    },
+    {
+      "key": "horse_therapy",
+      "displayName": "Horse Therapy (PATH-certified center)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["horse therapy", "equine therapy", "therapeutic horsemanship", "hippotherapy"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "notes": "PATH certification must be issued to the center, not to individuals.",
+      "ineligibleForProgram": {
+        "pep":   "Horse therapy is FES-UA only.",
+        "fesEO": "Horse therapy is FES-UA only."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Horse Therapy (page 25)"
+    },
+    {
+      "key": "music_art_therapy",
+      "displayName": "Music / Art Therapy (board-certified therapist)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["music therapy", "art therapy"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "requiresProviderCredentials": true,
+      "notes": "Music therapist must be certified by the Certification Board for Music Therapists; art therapist credentialed by Art Therapy Credentials Board, Inc.",
+      "ineligibleForProgram": {
+        "pep":   "Music/art therapy is FES-UA only.",
+        "fesEO": "Music/art therapy is FES-UA only."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Music and Art Therapy (page 26)"
+    },
+    {
+      "key": "transition_services",
+      "displayName": "Transition Services (job coaches, transition-to-work)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["transition service", "job coach", "transition to work", "vocational rehabilitation"],
+      "ineligibleKeywords": [],
+      "notes": "For students with a disability, ages 12-22.",
+      "ineligibleForProgram": {
+        "pep":   "Transition services are FES-UA only.",
+        "fesEO": "Transition services are FES-UA only."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Transition Services / Job Coaches (pages 22-24)"
+    },
+    {
+      "key": "exam_fees",
+      "displayName": "Standardized / AP / Industry Exam Fees",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["ap exam", "psat", "sat exam", "act exam", "clep", "industry certification", "ftce", "norm-referenced", "standardized test"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Testing and Assessments"
+    },
+    {
+      "key": "private_school_tuition",
+      "displayName": "Private School Tuition & Fees",
+      "programs": ["fesUA", "fesEO"],
+      "eligibility": "eligible",
+      "keywords": ["tuition", "private school"],
+      "ineligibleKeywords": ["annual fund", "donation", "fundraising", "lunch", "before-care", "after-care", "before or after school", "shoes", "optional fee", "nursery fee", "daycare fee"],
+      "requiresStudentName": true,
+      "notes": "Annual fees, before/after-school care, food/lunch, donations, optional fees, and shoes/accessories are explicitly prohibited tuition components.",
+      "ineligibleForProgram": {
+        "pep":   "PEP is for students NOT enrolled full-time in a public or private school. Use 'PEP Hybrid Private School' if the student attends a hybrid program ≥2 days/week."
+      },
+      "sourceCitation": "FES-UA page 13-14; FES-EO Tuition section"
+    },
+    {
+      "key": "pep_hybrid_school_tuition",
+      "displayName": "PEP Hybrid Private School Tuition (≥2 days/week, not full-time)",
+      "programs": ["pep"],
+      "eligibility": "eligible",
+      "keywords": ["hybrid school", "hybrid private school", "pep hybrid"],
+      "ineligibleKeywords": ["full-time enrollment"],
+      "requiresStudentName": true,
+      "notes": "Student attends physical location at least 2 school days/week; remaining instructional time addressed by Student Learning Plan.",
+      "sourceCitation": "PEP Purchasing Guide — Tuition & Fees at an Eligible PEP Hybrid Private School (page 16)"
+    },
+    {
+      "key": "home_education_program",
+      "displayName": "Home Education Instructional Program (tuition/fees)",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["home education program", "home education tuition", "co-op fee"],
+      "ineligibleKeywords": [],
+      "notes": "Must have publicly available program descriptions, published tuition, physical location (not online), and be a business organization.",
+      "sourceCitation": "FES-UA page 15; PEP page 16"
+    },
+    {
+      "key": "postsecondary_tuition",
+      "displayName": "Eligible Postsecondary / Dual Enrollment Tuition",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["dual enrollment", "college tuition", "state university", "postsecondary"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Eligible Postsecondary"
+    },
+    {
+      "key": "pre_apprenticeship",
+      "displayName": "Approved Pre-Apprenticeship Program (16+)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["pre-apprenticeship", "apprentice"],
+      "ineligibleKeywords": [],
+      "notes": "Student must be 16+. Program must be registered under Florida Statute 446.021.",
+      "sourceCitation": "All three Guides — Pre-Apprenticeship"
+    },
+    {
+      "key": "flvs_private_pay",
+      "displayName": "Florida Virtual School (Private-Pay only)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["florida virtual school", "flvs"],
+      "ineligibleKeywords": [],
+      "notes": "Must be enrolled as a private-pay student, NOT as a public-school student (the latter forfeits the scholarship).",
+      "sourceCitation": "All three Guides — FLVS Private-Pay"
+    },
+    {
+      "key": "evaluation_annual",
+      "displayName": "Annual Evaluation by Certified Teacher (home education)",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["annual evaluation", "portfolio review", "certified teacher evaluation"],
+      "ineligibleKeywords": [],
+      "requiresProviderCredentials": true,
+      "sourceCitation": "FES-UA Guide page 24; PEP Guide"
+    },
+    {
+      "key": "florida_prepaid",
+      "displayName": "Florida Prepaid College Program (reimbursable to parent)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["florida prepaid"],
+      "ineligibleKeywords": [],
+      "notes": "Must be paid out-of-pocket and reimbursed to the parent (no direct-pay).",
+      "ineligibleForProgram": {
+        "pep":   "Florida Prepaid / 529 contributions are not enumerated as eligible under PEP.",
+        "fesEO": "Florida Prepaid / 529 contributions are not enumerated as eligible under FES-EO."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Contributions to Approved College Savings (page 19)"
+    },
+    {
+      "key": "florida_529",
+      "displayName": "Florida College Savings Program (529, direct-pay only)",
+      "programs": ["fesUA"],
+      "eligibility": "directPayOnly",
+      "keywords": ["529 account", "college savings"],
+      "ineligibleKeywords": [],
+      "notes": "Must be UTMA/UGMA account type. Direct contributions from scholarship funds only — cannot be paid out-of-pocket and reimbursed.",
+      "ineligibleForProgram": {
+        "pep":   "529 contributions are not enumerated as eligible under PEP.",
+        "fesEO": "529 contributions are not enumerated as eligible under FES-EO."
+      },
+      "sourceCitation": "FES-UA Purchasing Guide — Florida College Savings Program (page 20)"
+    },
+    {
+      "key": "theme_park_admission",
+      "displayName": "Florida Theme Park Admission (capped, one per student per year, paid in full)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "needsPreAuth",
+      "keywords": ["theme park", "epcot", "magic kingdom", "animal kingdom", "hollywood studios", "seaworld", "universal studios", "islands of adventure", "legoland", "peppa pig theme park", "busch gardens", "dinosaur world", "epic universe", "gatorland"],
+      "ineligibleKeywords": ["annual pass payment plan", "parking", "souvenir", "premium access", "special event ticket", "after-hours", "season pass partial"],
+      "caps": {
+        "maxAmount": 299.00,
+        "perStudentPerYear": true,
+        "paidInFull": true,
+        "noBundling": true
+      },
+      "requiresStudentName": true,
+      "requiresEducationalBenefitForm": true,
+      "notes": "Maximum $299 + tax. Must be paid in full before submitting. Cannot be bundled with other receipts. Reimbursement category is Instructional Materials → Field Trips → Florida theme park admission. Eligible parks: Animal Kingdom, Busch Gardens Tampa Bay, Dinosaur World, Epcot, Epic Universe, Gatorland, Hollywood Studios, Islands of Adventure, LEGOLAND Florida, Magic Kingdom, Peppa Pig Theme Park, SeaWorld Orlando, Universal Studios Florida.",
+      "sourceCitation": "All three Guides — Field Trips / Florida theme park admission"
+    },
+    {
+      "key": "field_trip_admission",
+      "displayName": "Field Trip / Museum / Zoo / Aquarium Admission",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["museum admission", "zoo admission", "aquarium admission", "library membership", "state park", "national park", "cultural programming", "planetarium"],
+      "ineligibleKeywords": ["group rental", "secondary market", "resale", "stubhub"],
+      "requiresStudentName": true,
+      "notes": "Student admission only — family packages prorated. Must be purchased from vendor or authorized third-party seller. Out-of-state field trips require pre-authorization.",
+      "sourceCitation": "All three Guides — Field Trips & Other Activities"
+    },
+    {
+      "key": "single_admission_leisure",
+      "displayName": "Single-Admission Leisure (bowling, roller/ice skating, trampoline park) under $75",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["bowling", "roller skating", "ice skating", "trampoline park"],
+      "ineligibleKeywords": [],
+      "caps": {
+        "maxAmount": 75.00
+      },
+      "sourceCitation": "All three Guides — single-admission leisure under $75"
+    },
+    {
+      "key": "ticketed_event",
+      "displayName": "Ticketed Event (play / musical / orchestra)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["play ticket", "musical ticket", "orchestral performance", "theater ticket"],
+      "ineligibleKeywords": ["concert", "sporting event", "secondary market", "stubhub", "resale"],
+      "sourceCitation": "All three Guides — Ticketed events"
+    },
+    {
+      "key": "sensory_materials",
+      "displayName": "Sensory Materials (fidgets, weighted blankets, sensory swing)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["sensory", "fidget", "weighted blanket", "noise cancel", "balance ball", "air walker", "sensory swing", "sensory bundle", "comfort chair", "nugget couch"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Sensory Materials"
+    },
+    {
+      "key": "pe_enrichment",
+      "displayName": "P.E. / Sports / Music / Art / Enrichment",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["dance lesson", "sports lesson", "music lesson", "art class", "swim lesson", "martial arts", "skateboard", "gym membership", "class pass", "fitness class", "team fee", "sports uniform", "kayak", "bicycle", "stationary bike", "treadmill", "walking pad", "exercise bike"],
+      "ineligibleKeywords": ["motorized exercise", "motorized scooter", "ride-on", "golf cart", "motorized vehicle", "motorized watercraft", "sailboat", "inflatable slide", "bouncy house", "pool toy", "trampoline (large)"],
+      "notes": "Single-user items only. Adaptive exercise equipment needs pre-auth. P.E. activities outside Florida need pre-auth. PEP excludes non-specialized footwear.",
+      "sourceCitation": "All three Guides — Physical Education (P.E.)"
+    },
+    {
+      "key": "classroom_furniture",
+      "displayName": "At-Home Classroom Furnishings (TV up to 55\")",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["desk", "classroom chair", "bookshelf", "whiteboard", "bulletin board", "educational poster", "projector", "indoor projector", "drafting table", "picnic table", "rug", "foam tile", "storage container", "timer", "classroom television", "tv up to 55"],
+      "ineligibleKeywords": ["sofa", "couch", "bed", "tv over 55", "television over 55", "outdoor tv", "outdoor television"],
+      "caps": {
+        "tvSizeInchesMax": 55
+      },
+      "notes": "TV / projector / drafting table / picnic table: 2-year frequency.",
+      "sourceCitation": "All three Guides — At-Home Classroom Furnishings"
+    },
+    {
+      "key": "school_supplies",
+      "displayName": "School Supplies (notebooks, pens, calculator, etc.)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["notebook", "binder", "pencil", "pen", "marker", "crayon", "scissors", "calculator", "backpack", "bookbag", "lunchbox", "math tools", "compass", "protractor", "ruler", "stapler", "tape", "paperclip", "writing utensil", "printer ink"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — School Supplies"
+    },
+    {
+      "key": "lab_fees",
+      "displayName": "Science / Math / Computer Lab Fees & Materials",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["lab fee", "lab material", "lab equipment", "lab safety"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Lab Fees & Materials"
+    },
+    {
+      "key": "learning_manipulatives",
+      "displayName": "Learning Manipulatives & Creative Play (Legos, puzzles, blocks)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["block", "board game", "card game", "chess", "checker", "doll", "domino", "marble", "lego", "puzzle", "stuffed animal", "play kitchen", "water table", "dress-up clothing"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Learning Manipulatives"
+    },
+    {
+      "key": "musical_instruments",
+      "displayName": "Musical Instruments, Tuning, Repair, Insurance",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["musical instrument", "instrument tuning", "instrument repair", "instrument insurance", "instrument maintenance"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Musical Instruments & Equipment"
+    },
+    {
+      "key": "subscription_kits",
+      "displayName": "Educational Subscription Kit (mailed to home)",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["subscription kit", "kiwico", "monthly learning box"],
+      "ineligibleKeywords": [],
+      "notes": "Must be age- and size-appropriate.",
+      "sourceCitation": "All three Guides — Educational Subscription Kits"
+    },
+    {
+      "key": "ineligible_transport",
+      "displayName": "Transportation / Gas / Mileage / Lodging",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["gas", "fuel", "mileage", "uber", "lyft", "airfare", "public transportation", "lodging", "hotel"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Appendix A Prohibited"
+    },
+    {
+      "key": "ineligible_food",
+      "displayName": "Food / Meals / Snacks",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["lunch", "meal", "snack", "school lunch", "food fee", "breakfast fee", "beverage package"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Prohibited"
+    },
+    {
+      "key": "ineligible_medical",
+      "displayName": "Medical Services / Devices",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["mobility aid", "wheelchair", "contact lens", "non-prescription glasses", "non-prescription eyeglasses", "prescription sunglasses", "doctor visit", "medical device", "medical exam"],
+      "ineligibleKeywords": [],
+      "notes": "FES-UA: hearing aids fall under Assistive Technology, not Medical. PEP: one pair of prescription eyeglasses/year permitted (see prescription_eyeglasses_pep). FES-UA prescription eyeglasses fall under Assistive Technology.",
+      "sourceCitation": "All three Guides — Prohibited"
+    },
+    {
+      "key": "ineligible_tickets",
+      "displayName": "Concerts / Sporting Events / Resale / Arcades",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["concert", "sporting event", "resale ticket", "stubhub", "ticket reseller", "arcade", "bouncy house", "inflatable slide", "group admission", "group rental"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Prohibited"
+    },
+    {
+      "key": "ineligible_household",
+      "displayName": "Household / Large Appliances / Pool / Live Animals",
+      "programs": ["fesUA", "fesEO", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["large appliance", "household item", "pool", "jacuzzi", "live animal", "scooter", "warranty (general)", "irrigation system", "chicken coop", "ornamental plant", "outdoor television", "performance costume"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "All three Guides — Prohibited Household Items"
+    },
+    {
+      "key": "ineligible_devices_pep_fes_eo",
+      "displayName": "Digital Devices / Periphery (PEP & FES-EO prohibited)",
+      "programs": ["pep", "fesEO"],
+      "eligibility": "ineligible",
+      "keywords": [],
+      "phrasalKeywords": [],
+      "ineligibleKeywords": [],
+      "notes": "Devices like laptop, Chromebook, tablet, phone, smartwatch, periphery devices, monitors, printers, keyboards are explicitly prohibited under PEP and FES-EO. Use the 'device' category for FES-UA students.",
+      "sourceCitation": "PEP & FES-EO Appendix A"
+    }
+  ]
+}
