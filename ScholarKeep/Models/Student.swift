@@ -14,6 +14,10 @@ final class Student {
     var notes: String
     var createdAt: Date
 
+    @Relationship(deleteRule: .cascade, inverse: \Expense.student) var expenses: [Expense] = []
+    @Relationship(deleteRule: .cascade, inverse: \Claim.student) var claims: [Claim] = []
+    @Relationship(deleteRule: .cascade, inverse: \DevicePurchase.student) var devicePurchases: [DevicePurchase] = []
+
     init(
         id: UUID = UUID(),
         displayName: String,

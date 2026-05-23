@@ -1,0 +1,221 @@
+{
+  "schoolYear": "2026-27",
+  "sourceVersion": "seed-draft-1",
+  "lastUpdated": "2026-05-23",
+  "disclaimer": "Estimates only. Confirm against the official Purchasing Guide and Family Handbook.",
+  "deadlines": {
+    "spendWindowStart": "--07-01",
+    "spendWindowEnd": "--06-30",
+    "reimbursementSubmissionDeadline": "--07-31",
+    "onHoldDays": 30,
+    "reviewDaysMax": 60,
+    "disbursementDates": ["--02-01", "--04-01", "--08-01", "--11-01"]
+  },
+  "globalRules": {
+    "deviceReplacementYears": 2,
+    "peripheralPreAuthOver": 50.00,
+    "balanceCapNoNewFundingFESUA": 50000.00
+  },
+  "categories": [
+    {
+      "key": "curriculum_materials",
+      "displayName": "Curriculum & Instructional Materials",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["curriculum", "workbook", "textbook", "lesson", "instructional"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": false,
+      "requiresProviderCredentials": false,
+      "requiresEducationalBenefitForm": false,
+      "requiresPreAuth": false,
+      "sourceCitation": "Purchasing Guide — Instructional Materials"
+    },
+    {
+      "key": "books",
+      "displayName": "Books",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["book", "reader", "novel"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Books"
+    },
+    {
+      "key": "device",
+      "displayName": "Digital Device (laptop / tablet / e-reader)",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["laptop", "chromebook", "tablet", "ipad", "e-reader", "desktop", "computer"],
+      "ineligibleKeywords": [],
+      "requiresPreAuthIfWithinDeviceWindow": true,
+      "sourceCitation": "Purchasing Guide — Digital Devices (1 per 2 years)"
+    },
+    {
+      "key": "internet_subscription",
+      "displayName": "In-home Internet / Digital Subscription",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["internet", "wifi", "broadband", "subscription", "app"],
+      "ineligibleKeywords": ["family plan", "multi-user"],
+      "sourceCitation": "Purchasing Guide — Internet & Subscriptions"
+    },
+    {
+      "key": "online_course",
+      "displayName": "Online Course",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["online course", "outschool", "k12", "coursera"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Online Courses"
+    },
+    {
+      "key": "tutoring",
+      "displayName": "Tutoring",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["tutor", "tutoring"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "requiresProviderCredentials": true,
+      "sourceCitation": "Purchasing Guide — Tutoring"
+    },
+    {
+      "key": "exam_fees",
+      "displayName": "Standardized / AP / Industry Exam Fees",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["ap exam", "psat", "sat", "act", "clep", "industry certification", "test fee"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Testing"
+    },
+    {
+      "key": "private_school_tuition",
+      "displayName": "Private School Tuition & Fees",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["tuition", "private school"],
+      "ineligibleKeywords": ["registration fee", "donation", "fundraising", "lunch", "before-care", "after-care"],
+      "requiresStudentName": true,
+      "sourceCitation": "Purchasing Guide — Private School Tuition"
+    },
+    {
+      "key": "therapy_specialized",
+      "displayName": "Specialized Therapy (ABA / Speech / OT / PT)",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["aba", "speech", "occupational therapy", "physical therapy", "counseling", "psychotherapy", "vision therapy", "listening and spoken language"],
+      "ineligibleKeywords": [],
+      "requiresStudentName": true,
+      "requiresProviderCredentials": true,
+      "ineligibleForProgram": {"pep": "PEP does not cover specialized therapies"},
+      "sourceCitation": "FES-UA — Specialized Services"
+    },
+    {
+      "key": "evaluation_annual",
+      "displayName": "Annual Evaluation by Certified Teacher",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["annual evaluation", "portfolio review", "certified teacher evaluation"],
+      "requiresProviderCredentials": true,
+      "sourceCitation": "Purchasing Guide — Annual Evaluation"
+    },
+    {
+      "key": "florida_prepaid",
+      "displayName": "Florida Prepaid / College Savings",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "directPayOnly",
+      "keywords": ["florida prepaid", "college savings"],
+      "ineligibleKeywords": [],
+      "notes": "Direct-pay only; NOT reimbursable.",
+      "sourceCitation": "Purchasing Guide — Florida Prepaid"
+    },
+    {
+      "key": "theme_park",
+      "displayName": "Educational Theme-Park / Zoo / Museum Admission",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "needsPreAuth",
+      "keywords": ["theme park", "zoo", "museum", "aquarium", "admission", "epcot", "magic kingdom", "seaworld"],
+      "ineligibleKeywords": ["annual pass", "season pass", "parking", "souvenir", "food"],
+      "caps": {
+        "maxAmount": 299.00,
+        "perStudentPerClaim": true,
+        "paidInFull": true
+      },
+      "requiresStudentName": true,
+      "requiresEducationalBenefitForm": true,
+      "sourceCitation": "Purchasing Guide — Field Trips / Admissions"
+    },
+    {
+      "key": "sensory_materials",
+      "displayName": "Sensory Materials",
+      "programs": ["fesUA"],
+      "eligibility": "eligible",
+      "keywords": ["sensory", "fidget", "weighted blanket", "noise cancel"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Sensory Materials"
+    },
+    {
+      "key": "pe_enrichment",
+      "displayName": "P.E. / Electives / Enrichment",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["music lesson", "art class", "swim lesson", "martial arts", "dance class", "p.e.", "pe class"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Electives & Enrichment"
+    },
+    {
+      "key": "classroom_furniture",
+      "displayName": "Classroom Furnishings",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "eligible",
+      "keywords": ["desk", "chair", "bookshelf", "classroom furniture"],
+      "ineligibleKeywords": ["sofa", "couch", "bed"],
+      "sourceCitation": "Purchasing Guide — Classroom Furnishings"
+    },
+    {
+      "key": "ineligible_transport",
+      "displayName": "Transportation / Gas / Mileage",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["gas", "fuel", "mileage", "uber", "lyft", "airfare", "transportation"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Prohibited"
+    },
+    {
+      "key": "ineligible_food_lodging",
+      "displayName": "Food / Lodging / Meals",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["lunch", "meal", "food", "hotel", "lodging", "snack"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Prohibited"
+    },
+    {
+      "key": "ineligible_medical",
+      "displayName": "Medical Services / Devices",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["hearing aid", "mobility aid", "wheelchair", "medical", "non-prescription glasses"],
+      "ineligibleKeywords": [],
+      "notes": "PEP allows one prescription eyeglasses pair/year — handle as exception.",
+      "sourceCitation": "Purchasing Guide — Prohibited"
+    },
+    {
+      "key": "ineligible_tickets",
+      "displayName": "Concert / Sporting / Resale Tickets, Arcades",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["concert", "sporting event", "resale", "stubhub", "arcade", "ticket reseller"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Prohibited"
+    },
+    {
+      "key": "ineligible_household",
+      "displayName": "General Household Items / Large TVs",
+      "programs": ["fesUA", "pep"],
+      "eligibility": "ineligible",
+      "keywords": ["television over 55", "appliance", "household", "pool", "jacuzzi", "live animal", "scooter", "warranty"],
+      "ineligibleKeywords": [],
+      "sourceCitation": "Purchasing Guide — Prohibited"
+    }
+  ]
+}

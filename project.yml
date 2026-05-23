@@ -39,9 +39,37 @@ targets:
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone: "UIInterfaceOrientationPortrait"
         INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad: "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight"
         INFOPLIST_KEY_NSFaceIDUsageDescription: "ScholarKeep uses Face ID to keep your students' records and receipts private."
+        INFOPLIST_KEY_NSCameraUsageDescription: "ScholarKeep uses the camera to scan receipts so you don't have to type them in."
+        INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "ScholarKeep can import receipt photos from your library."
+        INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "ScholarKeep can save exported PDFs to your Photos library."
+        INFOPLIST_KEY_NSUserNotificationsUsageDescription: "ScholarKeep sends local reminders for submission deadlines and on-hold claims."
         INFOPLIST_KEY_CFBundleDisplayName: "ScholarKeep"
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.education"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
         ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME: AccentColor
         ENABLE_PREVIEWS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
+
+  ScholarKeepTests:
+    type: bundle.unit-test
+    platform: iOS
+    sources:
+      - path: Tests/ScholarKeepTests
+    dependencies:
+      - target: ScholarKeep
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlosreyes.scholarkeep.tests
+        GENERATE_INFOPLIST_FILE: YES
+        BUNDLE_LOADER: "$(TEST_HOST)"
+        TEST_HOST: "$(BUILT_PRODUCTS_DIR)/ScholarKeep.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ScholarKeep"
+schemes:
+  ScholarKeep:
+    build:
+      targets:
+        ScholarKeep: all
+        ScholarKeepTests: [test]
+    test:
+      targets:
+        - ScholarKeepTests
+      gatherCoverageData: true
