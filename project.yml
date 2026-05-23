@@ -43,6 +43,7 @@ targets:
         INFOPLIST_KEY_NSPhotoLibraryUsageDescription: "ScholarKeep can import receipt photos from your library."
         INFOPLIST_KEY_NSPhotoLibraryAddUsageDescription: "ScholarKeep can save exported PDFs to your Photos library."
         INFOPLIST_KEY_NSUserNotificationsUsageDescription: "ScholarKeep sends local reminders for submission deadlines and on-hold claims."
+        INFOPLIST_KEY_ITSAppUsesNonExemptEncryption: NO
         INFOPLIST_KEY_CFBundleDisplayName: "ScholarKeep"
         INFOPLIST_KEY_LSApplicationCategoryType: "public.app-category.education"
         ASSETCATALOG_COMPILER_APPICON_NAME: AppIcon
