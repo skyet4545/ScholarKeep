@@ -10,10 +10,15 @@ struct ScholarKeepApp: App {
         // UI-test entry point: --reset wipes UserDefaults and uses an in-memory store
         // so every test starts at a known onboarding state.
         let isUITest = CommandLine.arguments.contains("--reset")
+        let isScreenshot = CommandLine.arguments.contains("--screenshot")
         if isUITest {
             if let domain = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: domain)
             }
+        }
+        // Screenshot mode: pre-populate onboarding so capture lands directly on the app.
+        if isScreenshot {
+            UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
         }
         self._settings = State(initialValue: AppSettings(defaults: .standard))
         // First-party Apple crash + diagnostic capture (no third-party SDK).

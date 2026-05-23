@@ -6,7 +6,12 @@ struct RootView: View {
 
     private var bypassAuth: Bool {
         CommandLine.arguments.contains("--reset") ||
-        CommandLine.arguments.contains("--skip-auth")
+        CommandLine.arguments.contains("--skip-auth") ||
+        CommandLine.arguments.contains("--screenshot")
+    }
+
+    private var showPaywallOnLaunch: Bool {
+        CommandLine.arguments.contains("--showpaywall")
     }
 
     var body: some View {
@@ -22,7 +27,9 @@ struct RootView: View {
     @ViewBuilder
     private var gatedContent: some View {
         AppLockGate {
-            if settings.hasCompletedOnboarding {
+            if showPaywallOnLaunch {
+                PaywallView()
+            } else if settings.hasCompletedOnboarding {
                 MainTabView()
             } else {
                 OnboardingFlow()
