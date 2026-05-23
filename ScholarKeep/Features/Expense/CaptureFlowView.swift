@@ -22,15 +22,35 @@ struct CaptureFlowView: View {
     @State private var ocrText: String = ""
     @State private var processingError: String?
     @State private var isProcessing = false
+    /// When the scanner returns multiple pages, parse each one independently so
+    /// each becomes its own draft expense. Surfaced as a queue the parent steps
+    /// through in `ExpenseReviewView`.
+    @State private var pendingReceipts: [(image: UIImage, parsed: ParsedReceipt, ocrText: String)] = []
+    @State private var currentReceiptIndex = 0
+    @State private var showMultiReceiptPrompt = false
 
     var body: some View {
         Group {
-            if let parsed {
+            if !pendingReceipts.isEmpty, currentReceiptIndex < pendingReceipts.count {
+                // Step-through: review one drafted receipt at a time, then advance.
+                let current = pendingReceipts[currentReceiptIndex]
+                ExpenseReviewView(
+                    scannedImages: [current.image],
+                    parsed: current.parsed,
+                    rawOCRText: current.ocrText,
+                    student: student,
+                    onSaved: advanceQueue,
+                    queueHeader: pendingReceipts.count > 1
+                        ? "Receipt \(currentReceiptIndex + 1) of \(pendingReceipts.count)"
+                        : nil
+                )
+            } else if let parsed {
                 ExpenseReviewView(
                     scannedImages: images,
                     parsed: parsed,
                     rawOCRText: ocrText,
-                    student: student
+                    student: student,
+                    onSaved: { dismiss() }
                 )
             } else if isProcessing {
                 ProgressView("Reading receipt…")
@@ -124,12 +144,28 @@ struct CaptureFlowView: View {
         isProcessing = true
         Task {
             do {
-                let lines = try await ReceiptOCR.recognizeAll(images: imgs)
-                let parsedReceipt = ReceiptParser.parse(lines: lines)
-                await MainActor.run {
-                    self.ocrText = parsedReceipt.rawText
-                    self.parsed = parsedReceipt
-                    self.isProcessing = false
+                if imgs.count > 1 {
+                    // Multi-receipt scan: parse each page independently so each
+                    // becomes its own draft expense in the review queue.
+                    var queue: [(UIImage, ParsedReceipt, String)] = []
+                    for image in imgs {
+                        let lines = try await ReceiptOCR.recognize(image: image)
+                        let parsed = ReceiptParser.parse(lines: lines)
+                        queue.append((image, parsed, parsed.rawText))
+                    }
+                    await MainActor.run {
+                        self.pendingReceipts = queue
+                        self.currentReceiptIndex = 0
+                        self.isProcessing = false
+                    }
+                } else {
+                    let lines = try await ReceiptOCR.recognizeAll(images: imgs)
+                    let parsedReceipt = ReceiptParser.parse(lines: lines)
+                    await MainActor.run {
+                        self.ocrText = parsedReceipt.rawText
+                        self.parsed = parsedReceipt
+                        self.isProcessing = false
+                    }
                 }
             } catch {
                 await MainActor.run {
@@ -137,6 +173,14 @@ struct CaptureFlowView: View {
                     self.isProcessing = false
                 }
             }
+        }
+    }
+
+    private func advanceQueue() {
+        if currentReceiptIndex + 1 < pendingReceipts.count {
+            currentReceiptIndex += 1
+        } else {
+            dismiss()
         }
     }
 }

@@ -9,6 +9,32 @@ enum NotificationsService {
         case submissionDeadline
         case onHoldClock
         case deviceWindow
+        case recurringTask
+    }
+
+    /// Schedules a one-shot reminder for a recurring task. Fires 1 day before
+    /// the due date if there's still time, otherwise on the due date itself.
+    static func scheduleRecurringTask(_ task: RecurringTask) async {
+        guard await requestAuthorizationIfNeeded() else { return }
+        let dueDate = task.nextDueDate
+        let reminderDate = Calendar.current.date(byAdding: .day, value: -1, to: dueDate) ?? dueDate
+        let fireDate = max(reminderDate, .now.addingTimeInterval(60))
+        await removeIdentifiers(prefix: "recurring-\(task.id.uuidString)")
+        let trigger = UNCalendarNotificationTrigger(
+            dateMatching: Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: fireDate),
+            repeats: false
+        )
+        let content = UNMutableNotificationContent()
+        content.title = task.title
+        content.body = "Due \(dueDate.formatted(date: .abbreviated, time: .omitted))."
+        content.sound = .default
+        content.categoryIdentifier = Category.recurringTask.rawValue
+        let request = UNNotificationRequest(identifier: "recurring-\(task.id.uuidString)", content: content, trigger: trigger)
+        try? await UNUserNotificationCenter.current().add(request)
+    }
+
+    static func cancelRecurringTask(id: UUID) async {
+        await removeIdentifiers(prefix: "recurring-\(id.uuidString)")
     }
 
     static func requestAuthorizationIfNeeded() async -> Bool {

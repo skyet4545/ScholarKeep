@@ -1,0 +1,315 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>ScholarKeep — Florida ESA Receipt &amp; Reimbursement Tracker</title>
+    <meta name="description" content="Private, on-device tracker for Florida FES-UA, FES-EO, and PEP scholarship parents. Scan receipts, get instant eligibility verdicts, build rejection-proof submission packages. Free with optional Pro." />
+    <meta property="og:title" content="ScholarKeep — Florida ESA Receipt Tracker" />
+    <meta property="og:description" content="Scan receipts. Catch ineligible items before you buy. Never miss the July 31 deadline. All on your phone — nothing leaves your device." />
+    <link rel="icon" href="favicon.png" type="image/png" />
+    <style>
+      :root {
+        --accent: #2d638d;
+        --accent-dark: #1c3e58;
+        --gold: #e8c35b;
+        --bg: #fbf9f4;
+        --text: #1a1a1a;
+        --muted: #5a5a5a;
+        --card: #ffffff;
+        --border: #e6e2d8;
+      }
+      * { box-sizing: border-box; }
+      html, body {
+        margin: 0;
+        padding: 0;
+        font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", Helvetica, Arial, sans-serif;
+        color: var(--text);
+        background: var(--bg);
+        line-height: 1.5;
+      }
+      a { color: var(--accent); text-decoration: none; }
+      a:hover { text-decoration: underline; }
+      .container { max-width: 920px; margin: 0 auto; padding: 0 24px; }
+      header { padding: 24px 0; }
+      header .container { display: flex; align-items: center; justify-content: space-between; }
+      .brand { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 18px; }
+      .brand img { width: 36px; height: 36px; border-radius: 8px; }
+      nav a { margin-left: 24px; color: var(--text); font-weight: 500; font-size: 15px; }
+      .hero { padding: 60px 0 80px; text-align: center; }
+      .hero h1 { font-size: 48px; line-height: 1.1; margin: 0 0 16px; letter-spacing: -0.02em; }
+      .hero h1 .accent { color: var(--accent); }
+      .hero p.lede { font-size: 20px; color: var(--muted); max-width: 600px; margin: 0 auto 32px; }
+      .cta-row { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .btn {
+        display: inline-block;
+        padding: 14px 24px;
+        border-radius: 12px;
+        font-weight: 600;
+        font-size: 16px;
+        border: none;
+        cursor: pointer;
+        transition: transform 0.1s ease;
+      }
+      .btn:hover { transform: translateY(-1px); text-decoration: none; }
+      .btn-primary { background: var(--accent); color: white; }
+      .btn-primary:hover { background: var(--accent-dark); }
+      .btn-secondary { background: transparent; color: var(--accent); border: 1px solid var(--accent); }
+      .badges { margin-top: 36px; display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+      .badge {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        padding: 6px 14px;
+        font-size: 14px;
+        font-weight: 500;
+        color: var(--muted);
+      }
+      .badge strong { color: var(--accent); }
+
+      section.block { padding: 60px 0; }
+      section.block:nth-child(even) { background: var(--card); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+      h2 { font-size: 32px; margin: 0 0 32px; letter-spacing: -0.01em; text-align: center; }
+      h3 { font-size: 18px; margin: 0 0 8px; }
+
+      .grid { display: grid; gap: 24px; }
+      .grid.cols-3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+      .grid.cols-2 { grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
+
+      .card {
+        background: var(--card);
+        border: 1px solid var(--border);
+        border-radius: 16px;
+        padding: 24px;
+      }
+      .card .icon { font-size: 28px; margin-bottom: 12px; }
+      .card p { color: var(--muted); font-size: 15px; margin: 0; }
+
+      .pricing { text-align: center; }
+      .pricing .card { text-align: left; }
+      .pricing h3 { font-size: 14px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+      .pricing .price { font-size: 36px; font-weight: 700; margin: 8px 0; }
+      .pricing .price small { font-size: 16px; font-weight: 400; color: var(--muted); }
+      .pricing ul { list-style: none; padding: 0; margin: 16px 0 0; }
+      .pricing li { padding: 4px 0; font-size: 14px; }
+      .pricing li::before { content: "✓ "; color: var(--accent); font-weight: 700; }
+      .pricing .card.featured { border: 2px solid var(--accent); position: relative; }
+      .pricing .card.featured::before {
+        content: "MOST POPULAR";
+        position: absolute;
+        top: -12px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--accent);
+        color: white;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        padding: 4px 10px;
+        border-radius: 999px;
+      }
+
+      .programs .card { text-align: center; }
+      .programs h3 { color: var(--accent); }
+      .programs .tag {
+        display: inline-block;
+        background: var(--gold);
+        color: var(--accent-dark);
+        font-size: 12px;
+        font-weight: 700;
+        padding: 3px 8px;
+        border-radius: 6px;
+        margin-bottom: 8px;
+      }
+
+      .privacy {
+        background: linear-gradient(135deg, var(--accent), var(--accent-dark));
+        color: white;
+      }
+      .privacy h2 { color: white; }
+      .privacy p { color: rgba(255,255,255,0.92); font-size: 17px; max-width: 700px; margin: 0 auto 16px; text-align: center; }
+      .privacy ul { max-width: 600px; margin: 24px auto 0; }
+      .privacy li { padding: 6px 0; font-size: 15px; }
+
+      .faq h3 { font-size: 17px; margin-top: 24px; }
+      .faq p { color: var(--muted); font-size: 15px; margin: 4px 0 0; }
+
+      footer { padding: 40px 0; background: var(--card); border-top: 1px solid var(--border); }
+      footer .container { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 16px; }
+      footer p { color: var(--muted); font-size: 14px; margin: 0; }
+      footer nav a { color: var(--muted); margin-left: 16px; font-size: 14px; }
+
+      @media (max-width: 640px) {
+        .hero h1 { font-size: 36px; }
+        .hero p.lede { font-size: 18px; }
+        h2 { font-size: 26px; }
+        nav a { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <div class="container">
+        <div class="brand">
+          <img src="logo.png" alt="ScholarKeep" />
+          ScholarKeep
+        </div>
+        <nav>
+          <a href="#features">Features</a>
+          <a href="#programs">Programs</a>
+          <a href="#pricing">Pricing</a>
+          <a href="#faq">FAQ</a>
+        </nav>
+      </div>
+    </header>
+
+    <section class="hero">
+      <div class="container">
+        <h1>Stop losing receipts.<br /><span class="accent">Start getting reimbursed.</span></h1>
+        <p class="lede">
+          The private, on-device companion app for Florida parents managing
+          <strong>FES-UA, FES-EO, and PEP</strong> scholarships. Scan a receipt, get an
+          instant eligibility verdict, build a rejection-proof submission package.
+        </p>
+        <div class="cta-row">
+          <a class="btn btn-primary" href="https://testflight.apple.com/join/PLACEHOLDER">Join the TestFlight beta</a>
+          <a class="btn btn-secondary" href="#features">See features</a>
+        </div>
+        <div class="badges">
+          <span class="badge">⌚ <strong>Local-first</strong> — your data stays on your phone</span>
+          <span class="badge">🛡️ <strong>No third-party trackers</strong></span>
+          <span class="badge">📱 <strong>iOS 17+ native</strong></span>
+        </div>
+      </div>
+    </section>
+
+    <section class="block" id="features">
+      <div class="container">
+        <h2>Everything you need in one app</h2>
+        <div class="grid cols-3">
+          <div class="card"><div class="icon">📸</div><h3>Scan receipts</h3><p>On-device Apple Vision OCR pulls the vendor, date, total, and line items. Your receipts never touch a server.</p></div>
+          <div class="card"><div class="icon">✅</div><h3>Instant eligibility verdict</h3><p>Every purchase tagged Eligible, Needs Pre-Auth, Direct-Pay Only, or Ineligible — with a quote from the actual Purchasing Guide.</p></div>
+          <div class="card"><div class="icon">🛡️</div><h3>Documentation gates</h3><p>Catches the top denial reasons: missing card last-4, insurance double-dip, missing provider credentials, missing pre-auth.</p></div>
+          <div class="card"><div class="icon">💬</div><h3>"Can I buy this?" chat</h3><p>Type a purchase in plain English. Get a deterministic verdict cited back to the Purchasing Guide section.</p></div>
+          <div class="card"><div class="icon">📋</div><h3>Claim lifecycle</h3><p>Draft → Ready → Submitted → On Hold → Approved → Paid. Status history, denial-reason fixes, on-hold reminder.</p></div>
+          <div class="card"><div class="icon">📅</div><h3>Deadline reminders</h3><p>Local notifications for May 29 pre-auth cutoff, June 30 spend cliff, July 31 submission cliff — and the 2-year device window.</p></div>
+          <div class="card"><div class="icon">👥</div><h3>Provider vault</h3><p>Store tutors and therapists with license numbers and credentials. Catches receipts missing required credentials.</p></div>
+          <div class="card"><div class="icon">💰</div><h3>Balance ledger</h3><p>Initial award, disbursements, paid claims, pending claims, refunds — what's actually available to spend.</p></div>
+          <div class="card"><div class="icon">🔁</div><h3>Recurring task tracker</h3><p>Annual evaluations, quarterly receipts, renewal applications — never miss what comes around every year.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="block programs" id="programs">
+      <div class="container">
+        <h2>Supports all three Florida ESA programs</h2>
+        <div class="grid cols-3">
+          <div class="card">
+            <div class="tag">Disability-based</div>
+            <h3>FES-UA</h3>
+            <p><strong>Unique Abilities.</strong> ~$10k avg, up to $34k. Specialized therapies (ABA, OT, PT, speech), digital devices, sensory materials, private school tuition.</p>
+          </div>
+          <div class="card">
+            <div class="tag">Income-based</div>
+            <h3>FES-EO</h3>
+            <p><strong>Educational Options.</strong> ~$7,500–$9,500/yr. Tuition-focused for students enrolled full-time at an eligible private school.</p>
+          </div>
+          <div class="card">
+            <div class="tag">Homeschool</div>
+            <h3>PEP</h3>
+            <p><strong>Personalized Education Program.</strong> ~$8,000/yr. Curriculum, tutoring, electives, field trips, online courses — for students not enrolled full-time in school.</p>
+          </div>
+        </div>
+        <p style="text-align: center; color: var(--muted); margin-top: 24px; font-size: 14px;">
+          Administered by Step Up For Students (EMA) and AAA Scholarship Foundation (SMP). ScholarKeep is not affiliated with either.
+        </p>
+      </div>
+    </section>
+
+    <section class="block privacy">
+      <div class="container">
+        <h2>Truly local-first</h2>
+        <p>
+          We don't have servers. We don't have analytics. We don't sell your data because we don't have it.
+          Every receipt, every claim, every dollar — it all lives on your phone.
+        </p>
+        <ul>
+          <li>📵 No third-party SDKs, no trackers, no ad networks</li>
+          <li>📸 On-device Apple Vision OCR — receipts never upload</li>
+          <li>🔐 Sign in with Apple gates the app; no password to manage</li>
+          <li>☁️ Optional iCloud backup uses your personal Apple iCloud (Pro)</li>
+          <li>🗑️ Export everything or wipe everything in one tap</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="block pricing" id="pricing">
+      <div class="container">
+        <h2>Pay only if you want exports</h2>
+        <div class="grid cols-2">
+          <div class="card">
+            <h3>Free forever</h3>
+            <div class="price">$0</div>
+            <ul>
+              <li>Unlimited students</li>
+              <li>Full eligibility engine, all 3 programs</li>
+              <li>Receipt scanning + manual entry</li>
+              <li>Complete claim lifecycle</li>
+              <li>Provider vault + pre-auth tracker</li>
+              <li>Balance ledger</li>
+              <li>Recurring task tracker</li>
+              <li>"Can I buy this?" chat</li>
+              <li>Reference guide</li>
+              <li>Deadline reminders</li>
+            </ul>
+          </div>
+          <div class="card featured">
+            <h3>Pro</h3>
+            <div class="price">$4.99<small>/mo</small> · $39.99<small>/yr</small></div>
+            <ul>
+              <li>Everything in Free</li>
+              <li>PDF submission packages (per-expense + per-claim)</li>
+              <li>CSV exports for taxes and records</li>
+              <li>iCloud backup across iPhone &amp; iPad</li>
+              <li>Year-end summary report</li>
+              <li>7-day free trial</li>
+              <li>Apple Family Sharing — covers 6 family members</li>
+            </ul>
+          </div>
+        </div>
+        <p style="margin-top: 32px; color: var(--muted); font-size: 14px;">
+          Subscriptions auto-renew until cancelled. Cancel anytime in Settings → Apple ID → Subscriptions.
+        </p>
+      </div>
+    </section>
+
+    <section class="block faq" id="faq">
+      <div class="container" style="max-width: 720px;">
+        <h2>FAQ</h2>
+        <h3>Is ScholarKeep affiliated with Step Up For Students or the state of Florida?</h3>
+        <p>No. ScholarKeep is an independent personal-records tool. It is not affiliated with, endorsed by, or connected to the Florida Department of Education, Step Up For Students, AAA Scholarship Foundation, EMA, SMP, or any official scholarship system. You submit your claims through the official portal yourself — ScholarKeep helps you organize and verify.</p>
+        <h3>Are eligibility verdicts guaranteed?</h3>
+        <p>No. Every verdict is an estimate based on the published 2025-26 Purchasing Guides. Your Scholarship Funding Organization reviews every claim independently. ScholarKeep helps you avoid the most common denial reasons; it can't guarantee approval.</p>
+        <h3>Does my data ever leave my phone?</h3>
+        <p>Only if you turn on iCloud backup (Pro), in which case it syncs through your personal Apple iCloud — not through us. We don't operate any servers.</p>
+        <h3>Which programs do you support?</h3>
+        <p>All three Florida ESA programs: FES-UA, FES-EO, and PEP.</p>
+        <h3>How do I cancel a Pro subscription?</h3>
+        <p>iOS Settings → Apple ID → Subscriptions. Cancellation takes effect at the end of the current billing period.</p>
+        <h3>Will my receipts auto-import from email?</h3>
+        <p>Not in this release. Email forwarding would require a backend we don't run. If demand justifies it, we'll add it as a Family-tier feature in a future release.</p>
+      </div>
+    </section>
+
+    <footer>
+      <div class="container">
+        <p>© 2026 Carlos Reyes · ScholarKeep is not affiliated with any scholarship organization or government agency.</p>
+        <nav>
+          <a href="LEGAL/privacy-policy">Privacy</a>
+          <a href="LEGAL/terms-of-service">Terms</a>
+          <a href="support">Support</a>
+        </nav>
+      </div>
+    </footer>
+  </body>
+</html>

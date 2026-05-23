@@ -23,6 +23,12 @@ struct ScholarKeepApp: App {
         self._settings = State(initialValue: AppSettings(defaults: .standard))
         // First-party Apple crash + diagnostic capture (no third-party SDK).
         _ = CrashDiagnostics.shared
+        // Background-refresh the ruleset from the public URL. Fails silently.
+        if !isUITest {
+            Task.detached(priority: .background) {
+                _ = await RulesetLoader.shared.fetchRemote()
+            }
+        }
 
         let schema = Schema([
             Student.self,
@@ -35,7 +41,8 @@ struct ScholarKeepApp: App {
             Provider.self,
             PreAuthorization.self,
             Refund.self,
-            BalanceEntry.self
+            BalanceEntry.self,
+            RecurringTask.self
         ])
         let configuration = ModelConfiguration(
             schema: schema,

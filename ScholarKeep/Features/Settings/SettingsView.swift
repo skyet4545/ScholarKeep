@@ -164,15 +164,51 @@ struct SettingsView: View {
         }
     }
 
+    @State private var rulesetRefreshing = false
+    @State private var rulesetRefreshResult: String?
+
     private var rulesetSection: some View {
         Section("Ruleset") {
             if let rs = RulesetLoader.shared.ruleset {
                 LabeledContent("School year", value: rs.schoolYear)
                 LabeledContent("Version", value: rs.sourceVersion)
                 LabeledContent("Updated", value: rs.lastUpdated)
+                LabeledContent("Source", value: RulesetLoader.shared.lastRefreshSource.rawValue)
+                if let when = RulesetLoader.shared.lastRefreshAt {
+                    LabeledContent("Last refresh", value: when.formatted(date: .abbreviated, time: .shortened))
+                }
             }
-            Button("Re-load bundled ruleset") {
-                RulesetLoader.shared.reload()
+            Button {
+                refreshRuleset()
+            } label: {
+                if rulesetRefreshing {
+                    HStack { ProgressView(); Text("Checking…") }
+                } else {
+                    Label("Check for updates", systemImage: "arrow.down.circle")
+                }
+            }
+            .disabled(rulesetRefreshing)
+            if let rulesetRefreshResult {
+                Text(rulesetRefreshResult).font(.caption).foregroundStyle(.secondary)
+            }
+            Button("Reset to bundled ruleset") {
+                RulesetLoader.shared.clearCache()
+                rulesetRefreshResult = "Cache cleared, reloaded bundled."
+            }
+            .font(.caption)
+        }
+    }
+
+    private func refreshRuleset() {
+        rulesetRefreshing = true
+        rulesetRefreshResult = nil
+        Task {
+            let success = await RulesetLoader.shared.fetchRemote()
+            await MainActor.run {
+                rulesetRefreshing = false
+                rulesetRefreshResult = success
+                    ? "Updated from remote."
+                    : "No update available (or offline). Using current ruleset."
             }
         }
     }

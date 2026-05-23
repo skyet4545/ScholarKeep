@@ -11,6 +11,12 @@ struct ExpenseReviewView: View {
     let parsed: ParsedReceipt
     let rawOCRText: String
     let student: Student
+    /// Called after the user taps Save. When the parent flow is stepping through
+    /// a queue of multi-receipt drafts, this advances to the next one. When nil,
+    /// the default behavior is to dismiss.
+    var onSaved: (() -> Void)? = nil
+    /// "Receipt 2 of 3" header for queue mode. Nil when single-receipt.
+    var queueHeader: String? = nil
 
     @State private var vendorName: String
     @State private var purchaseDate: Date
@@ -27,11 +33,13 @@ struct ExpenseReviewView: View {
 
     @State private var liveEligibility: EligibilityResult?
 
-    init(scannedImages: [UIImage], parsed: ParsedReceipt, rawOCRText: String, student: Student) {
+    init(scannedImages: [UIImage], parsed: ParsedReceipt, rawOCRText: String, student: Student, onSaved: (() -> Void)? = nil, queueHeader: String? = nil) {
         self.scannedImages = scannedImages
         self.parsed = parsed
         self.rawOCRText = rawOCRText
         self.student = student
+        self.onSaved = onSaved
+        self.queueHeader = queueHeader
         _vendorName = State(initialValue: parsed.vendorName)
         _purchaseDate = State(initialValue: parsed.purchaseDate ?? .now)
         _subtotalText = State(initialValue: parsed.subtotal?.editingString() ?? "")
@@ -43,6 +51,13 @@ struct ExpenseReviewView: View {
     var body: some View {
         NavigationStack {
             Form {
+                if let queueHeader {
+                    Section {
+                        Label(queueHeader, systemImage: "doc.on.doc")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tint)
+                    }
+                }
                 eligibilitySection
                 receiptSection
                 amountsSection
@@ -262,7 +277,11 @@ struct ExpenseReviewView: View {
 
         do {
             try modelContext.save()
-            dismiss()
+            if let onSaved {
+                onSaved()
+            } else {
+                dismiss()
+            }
         } catch {
             saveError = "Couldn't save: \(error.localizedDescription)"
         }

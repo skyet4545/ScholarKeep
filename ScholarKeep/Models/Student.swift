@@ -24,6 +24,7 @@ final class Student {
     @Relationship(deleteRule: .cascade, inverse: \Provider.student) var providers: [Provider] = []
     @Relationship(deleteRule: .cascade, inverse: \PreAuthorization.student) var preAuthorizations: [PreAuthorization] = []
     @Relationship(deleteRule: .cascade, inverse: \BalanceEntry.student) var balanceEntries: [BalanceEntry] = []
+    @Relationship(deleteRule: .cascade, inverse: \RecurringTask.student) var recurringTasks: [RecurringTask] = []
 
     init(
         id: UUID = UUID(),

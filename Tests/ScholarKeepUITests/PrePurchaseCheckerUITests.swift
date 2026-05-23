@@ -24,20 +24,23 @@ final class PrePurchaseCheckerUITests: XCTestCase {
         app.tabBars.buttons["Check"].tap()
         XCTAssertTrue(app.navigationBars["Can I buy this?"].waitForExistence(timeout: 3))
 
-        // Describe purchase (SwiftUI vertical-axis TextField shows as a textField in XCUITest)
-        let descField = app.textFields["Describe the item or service"]
-        XCTAssertTrue(descField.waitForExistence(timeout: 3))
-        descField.tap()
-        descField.typeText("Gas for co-op drive")
-
-        // Amount field uses "0.00" placeholder
-        let amountField = app.textFields["0.00"]
-        XCTAssertTrue(amountField.exists)
+        // Chat-style input: amount capsule + description capsule
+        let amountField = app.textFields["Amount"]
+        XCTAssertTrue(amountField.waitForExistence(timeout: 3))
         amountField.tap()
         amountField.typeText("40")
 
-        app.buttons["Check eligibility"].tap()
-        // Result section should show Ineligible label
+        let descField = app.textFields["Describe what you're buying"]
+        XCTAssertTrue(descField.exists)
+        descField.tap()
+        descField.typeText("Gas for co-op drive")
+
+        // Tap the send arrow that appears once input is non-empty
+        let sendButton = app.buttons["sendChat"]
+        XCTAssertTrue(sendButton.waitForExistence(timeout: 3))
+        sendButton.tap()
+
+        // Bot bubble should render an Ineligible verdict header
         XCTAssertTrue(app.staticTexts["Ineligible"].waitForExistence(timeout: 5))
     }
 }

@@ -82,6 +82,9 @@ struct MoreMenuView: View {
                 NavigationLink { PreAuthListView() } label: {
                     Label("Pre-authorizations", systemImage: "checkmark.shield")
                 }
+                NavigationLink { RecurringTaskListView() } label: {
+                    Label("Recurring tasks", systemImage: "checklist")
+                }
                 NavigationLink { ReportsView() } label: {
                     Label("Reports & export", systemImage: "chart.bar.doc.horizontal")
                 }
