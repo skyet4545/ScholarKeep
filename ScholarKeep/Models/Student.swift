@@ -14,9 +14,16 @@ final class Student {
     var notes: String
     var createdAt: Date
 
+    /// PEP-only: date the Student Learning Plan was approved. Purchases before
+    /// this date are permanently ineligible under PEP — no appeals.
+    var slpApprovedDate: Date?
+
     @Relationship(deleteRule: .cascade, inverse: \Expense.student) var expenses: [Expense] = []
     @Relationship(deleteRule: .cascade, inverse: \Claim.student) var claims: [Claim] = []
     @Relationship(deleteRule: .cascade, inverse: \DevicePurchase.student) var devicePurchases: [DevicePurchase] = []
+    @Relationship(deleteRule: .cascade, inverse: \Provider.student) var providers: [Provider] = []
+    @Relationship(deleteRule: .cascade, inverse: \PreAuthorization.student) var preAuthorizations: [PreAuthorization] = []
+    @Relationship(deleteRule: .cascade, inverse: \BalanceEntry.student) var balanceEntries: [BalanceEntry] = []
 
     init(
         id: UUID = UUID(),
@@ -28,6 +35,7 @@ final class Student {
         schoolYear: String = SchoolYear.label(),
         awardAmount: Decimal? = nil,
         notes: String = "",
+        slpApprovedDate: Date? = nil,
         createdAt: Date = .now
     ) {
         self.id = id
@@ -39,6 +47,7 @@ final class Student {
         self.schoolYear = schoolYear
         self.awardAmount = awardAmount
         self.notes = notes
+        self.slpApprovedDate = slpApprovedDate
         self.createdAt = createdAt
     }
 
@@ -50,5 +59,13 @@ final class Student {
     var sfo: SFO {
         get { SFO(rawValue: sfoRaw) ?? .stepUp }
         set { sfoRaw = newValue.rawValue }
+    }
+
+    /// Convenience: does this PEP student have an approved SLP that pre-dates `purchaseDate`?
+    /// Always true for non-PEP students.
+    func slpApprovedBefore(_ purchaseDate: Date) -> Bool {
+        guard program == .pep else { return true }
+        guard let approved = slpApprovedDate else { return false }
+        return approved <= purchaseDate
     }
 }

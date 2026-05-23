@@ -70,7 +70,10 @@ struct ExpenseDetailView: View {
                     requiresStudentName: false,
                     requiresProviderCredentials: false,
                     requiresEducationalBenefitForm: false,
-                    citations: []
+                    requiresFloridaTeacherCertificate: false,
+                    requiresFloridaLicensedProvider: false,
+                    citations: [],
+                    providerCredentialOptions: []
                 )
                 EligibilityBadgeView(result: result)
                 if let v = expense.rulesetVersion {

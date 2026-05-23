@@ -24,7 +24,11 @@ struct ScholarKeepApp: App {
             Attachment.self,
             Claim.self,
             StatusEvent.self,
-            DevicePurchase.self
+            DevicePurchase.self,
+            Provider.self,
+            PreAuthorization.self,
+            Refund.self,
+            BalanceEntry.self
         ])
         let configuration = ModelConfiguration(
             schema: schema,

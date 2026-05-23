@@ -176,7 +176,9 @@ struct ExpenseReviewView: View {
             amount: total,
             program: student.program,
             acquisitionPath: acquisitionPath,
-            studentHasDeviceWithinWindow: withinDeviceWindow
+            studentHasDeviceWithinWindow: withinDeviceWindow,
+            slpApprovedBeforePurchase: student.slpApprovedBefore(purchaseDate),
+            purchaseDate: purchaseDate
         )
         liveEligibility = engine.evaluate(input: input)
     }

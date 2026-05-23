@@ -17,6 +17,18 @@ final class Expense {
     var paymentMethodRaw: String
     var acquisitionPathRaw: String
 
+    // NEW v0.2 fields
+    /// Last 4 digits of the card used (most-cited PoP denial reason).
+    var cardLast4: String?
+    /// Parent confirmed no insurance/HSA/School Readiness paid any portion.
+    var noDoubleDipConfirmed: Bool
+    /// PaidInFull flag for theme-park-style claims.
+    var paidInFull: Bool
+    /// Total refund amount applied (derived from refunds[]).
+    var refundedAmount: Decimal { refunds.reduce(0) { $0 + $1.refundAmount } }
+    /// Net amount eligible for reimbursement after refunds.
+    var netReimbursableAmount: Decimal { total - refundedAmount }
+
     var eligibilityResultRaw: String?
     var eligibilityReason: String
     var eligibilityReasonsList: [String]
@@ -34,8 +46,11 @@ final class Expense {
     var createdAt: Date
 
     var student: Student?
+    var provider: Provider?
+    var preAuthorization: PreAuthorization?
     @Relationship(deleteRule: .cascade, inverse: \LineItem.expense) var lineItems: [LineItem]
     @Relationship(deleteRule: .cascade, inverse: \Attachment.expense) var attachments: [Attachment]
+    @Relationship(deleteRule: .cascade, inverse: \Refund.expense) var refunds: [Refund]
     var claim: Claim?
 
     init(
@@ -51,6 +66,9 @@ final class Expense {
         subcategory: String = "",
         paymentMethod: PaymentMethod = .card,
         acquisitionPath: AcquisitionPath = .reimbursement,
+        cardLast4: String? = nil,
+        noDoubleDipConfirmed: Bool = false,
+        paidInFull: Bool = true,
         eligibilityResult: EligibilityStatus? = nil,
         eligibilityReason: String = "",
         eligibilityReasonsList: [String] = [],
@@ -64,8 +82,11 @@ final class Expense {
         notes: String = "",
         createdAt: Date = .now,
         student: Student? = nil,
+        provider: Provider? = nil,
+        preAuthorization: PreAuthorization? = nil,
         lineItems: [LineItem] = [],
         attachments: [Attachment] = [],
+        refunds: [Refund] = [],
         claim: Claim? = nil
     ) {
         self.id = id
@@ -80,6 +101,9 @@ final class Expense {
         self.subcategory = subcategory
         self.paymentMethodRaw = paymentMethod.rawValue
         self.acquisitionPathRaw = acquisitionPath.rawValue
+        self.cardLast4 = cardLast4
+        self.noDoubleDipConfirmed = noDoubleDipConfirmed
+        self.paidInFull = paidInFull
         self.eligibilityResultRaw = eligibilityResult?.rawValue
         self.eligibilityReason = eligibilityReason
         self.eligibilityReasonsList = eligibilityReasonsList
@@ -93,8 +117,11 @@ final class Expense {
         self.notes = notes
         self.createdAt = createdAt
         self.student = student
+        self.provider = provider
+        self.preAuthorization = preAuthorization
         self.lineItems = lineItems
         self.attachments = attachments
+        self.refunds = refunds
         self.claim = claim
     }
 
@@ -123,5 +150,19 @@ final class Expense {
         set {
             readinessChecklistData = try? JSONEncoder().encode(newValue)
         }
+    }
+
+    /// True when the parent has completed every applicable readiness item AND confirmed
+    /// no double-billing AND, if a card was used, supplied the last 4 digits.
+    var isFullyReadyForSubmit: Bool {
+        let checklist = readinessChecklist
+        let cardOK: Bool
+        switch paymentMethod {
+        case .card:
+            cardOK = (cardLast4?.count == 4)
+        default:
+            cardOK = true
+        }
+        return checklist.isComplete && noDoubleDipConfirmed && cardOK
     }
 }

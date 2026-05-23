@@ -48,7 +48,7 @@ enum ClaimStateMachine {
             throw TransitionError.notAllowed(from: claim.status, to: next)
         }
         if next == .readyToSubmit {
-            for expense in claim.expenses where !expense.readinessChecklist.isComplete {
+            for expense in claim.expenses where !expense.isFullyReadyForSubmit {
                 throw TransitionError.checklistIncomplete
             }
         }

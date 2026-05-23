@@ -1,7 +1,9 @@
 import XCTest
 @testable import ScholarKeep
 
-/// Drives the Appendix B test table through the engine using the bundled ruleset.
+/// Engine sanity tests against the 2026-27-v1 ruleset (built from the official
+/// Step Up Purchasing Guides). Spec Appendix B has been superseded by the
+/// rules-as-of-current-year — these are the up-to-date assertions.
 final class EligibilityEngineTests: XCTestCase {
     private var engine: EligibilityEngine!
 
@@ -9,37 +11,52 @@ final class EligibilityEngineTests: XCTestCase {
         engine = try TestRuleset.engine()
     }
 
-    // Appendix B test cases (descriptions + expected verdicts).
     func testABATherapyOnFESUA_LikelyEligible() {
         let result = engine.evaluateFreeText("ABA therapy session, provider license #",
                                              amount: 200, program: .fesUA)
         XCTAssertEqual(result.status, .likelyEligible)
         XCTAssertTrue(result.requiresProviderCredentials)
+        XCTAssertTrue(result.requiresFloridaLicensedProvider)
     }
 
     func testABATherapyOnPEP_Ineligible() {
-        let result = engine.evaluateFreeText("ABA therapy session",
-                                             amount: 200, program: .pep)
+        let result = engine.evaluateFreeText("ABA therapy session", amount: 200, program: .pep)
         XCTAssertEqual(result.status, .ineligible)
     }
 
-    func testChromebookNoPriorDevice_LikelyEligible() {
-        let result = engine.evaluateFreeText("Chromebook",
-                                             amount: 350, program: .pep,
+    func testChromebookFESUA_NoPriorDevice_LikelyEligible() {
+        let result = engine.evaluateFreeText("Chromebook for math lessons",
+                                             amount: 350, program: .fesUA,
                                              studentHasDeviceWithinWindow: false)
         XCTAssertEqual(result.status, .likelyEligible)
     }
 
-    func testChromebookRecentDevice_NeedsPreAuth() {
+    func testChromebookFESUA_RecentDevice_NeedsPreAuth() {
         let result = engine.evaluateFreeText("Chromebook",
-                                             amount: 350, program: .pep,
+                                             amount: 350, program: .fesUA,
                                              studentHasDeviceWithinWindow: true)
         XCTAssertEqual(result.status, .needsPreAuth)
         XCTAssertTrue(result.requiresPreAuth)
     }
 
-    func testFloridaPrepaidReimbursement_DirectPayOnly() {
+    func testChromebookPEP_HardIneligible() {
+        let result = engine.evaluateFreeText("Chromebook for math lessons",
+                                             amount: 350, program: .pep)
+        XCTAssertEqual(result.status, .ineligible,
+                       "PEP explicitly prohibits laptops/Chromebooks")
+    }
+
+    func testFloridaPrepaidReimbursement_FESUA_LikelyEligible() {
+        // FES-UA Prepaid is the one that MUST go through reimbursement (no direct-pay option).
         let result = engine.evaluateFreeText("Florida Prepaid contribution",
+                                             amount: 500, program: .fesUA,
+                                             acquisitionPath: .reimbursement)
+        XCTAssertEqual(result.status, .likelyEligible)
+    }
+
+    func testFlorida529_DirectPayOnly() {
+        // 529 contributions go via direct-pay only — reimbursement is blocked.
+        let result = engine.evaluateFreeText("529 college savings contribution",
                                              amount: 500, program: .fesUA,
                                              acquisitionPath: .reimbursement)
         XCTAssertEqual(result.status, .directPayOnly)
@@ -51,17 +68,25 @@ final class EligibilityEngineTests: XCTestCase {
         XCTAssertEqual(result.status, .ineligible)
     }
 
-    func testZooAdmissionUnderCap_NeedsPreAuth() {
-        let result = engine.evaluateFreeText("Zoo admission $250, one student",
+    func testThemeParkAdmissionUnderCap_NeedsPreAuth() {
+        let result = engine.evaluateFreeText("Magic Kingdom theme park admission $250",
                                              amount: 250, program: .pep)
         XCTAssertEqual(result.status, .needsPreAuth)
         XCTAssertTrue(result.requiresEducationalBenefitForm)
     }
 
     func testThemeParkOverCap_Ineligible() {
-        let result = engine.evaluateFreeText("Theme park annual pass",
+        let result = engine.evaluateFreeText("Universal Studios annual pass $480",
                                              amount: 480, program: .pep)
         XCTAssertEqual(result.status, .ineligible)
+    }
+
+    func testZooAdmission_GenericFieldTrip_LikelyEligible() {
+        // Per 2025-26 guides, zoo/museum/aquarium are listed under generic Field Trips
+        // (not the capped theme-park category) and are eligible for all programs.
+        let result = engine.evaluateFreeText("Zoo admission for one student",
+                                             amount: 25, program: .pep)
+        XCTAssertEqual(result.status, .likelyEligible)
     }
 
     func testMathCurriculumWorkbook_LikelyEligible() {

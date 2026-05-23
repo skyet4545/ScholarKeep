@@ -94,6 +94,9 @@ final class ClaimStateMachineTests: XCTestCase {
             cl.studentNamePresent = true
             cl.noHandwrittenAlterations = true
             e.readinessChecklist = cl
+            // v0.2 readiness also requires double-dip confirm and (for card payments) last4.
+            e.noDoubleDipConfirmed = true
+            e.paymentMethod = .ach    // skip the card last-4 requirement
         }
     }
 }

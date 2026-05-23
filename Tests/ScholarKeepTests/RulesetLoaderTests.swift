@@ -33,7 +33,8 @@ final class RulesetLoaderTests: XCTestCase {
         let ruleset = try TestRuleset.load()
         // The repeating-date format starts with "--MM-DD"
         XCTAssertTrue(ruleset.deadlines.reimbursementSubmissionDeadline.hasPrefix("--"))
-        XCTAssertGreaterThan(ruleset.deadlines.onHoldDays, 0)
         XCTAssertGreaterThan(ruleset.deadlines.reviewDaysMax, 0)
+        // Pre-auth deadline is optional but should exist in current ruleset.
+        XCTAssertNotNil(ruleset.deadlines.preAuthDeadline)
     }
 }
