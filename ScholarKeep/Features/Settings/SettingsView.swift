@@ -172,6 +172,11 @@ struct SettingsView: View {
             Button("View disclaimer") { showDisclaimer = true }
             LabeledContent("Version", value: appVersionString)
             LabeledContent("Today", value: Date().formatted(date: .long, time: .omitted))
+            if let phone = RulesetLoader.shared.ruleset?.globalRules.stepUpSupportPhone, let url = URL(string: "tel:\(phone.filter { $0.isNumber || $0 == "+" })") {
+                Link(destination: url) {
+                    LabeledContent("Step Up support", value: phone)
+                }
+            }
         }
     }
 

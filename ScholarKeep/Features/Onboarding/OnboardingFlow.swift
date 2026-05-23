@@ -108,7 +108,8 @@ struct OnboardingFlow: View {
                 county: $draft.county,
                 schoolYear: $draft.schoolYear,
                 awardAmountText: $draft.awardAmountText,
-                notes: $draft.notes
+                notes: $draft.notes,
+                slpApprovedDate: $draft.slpApprovedDate
             )
             if let saveError {
                 Text(saveError)

@@ -6,6 +6,7 @@ struct DashboardView: View {
     @Query(sort: \Student.createdAt) private var students: [Student]
     @Query(sort: \Expense.purchaseDate, order: .reverse) private var expenses: [Expense]
     @Query(sort: \Claim.createdAt, order: .reverse) private var claims: [Claim]
+    @Query(sort: \BalanceEntry.date) private var balanceEntries: [BalanceEntry]
 
     @State private var showCapture = false
     @State private var capturingSource: CaptureFlowView.Source = .scanner
@@ -31,6 +32,7 @@ struct DashboardView: View {
                 VStack(alignment: .leading, spacing: 16) {
                     activeStudentCard
                     scanCTA
+                    balanceCard
                     needsAttentionCard
                     deadlineCard
                     claimsSummaryCard
@@ -131,6 +133,38 @@ struct DashboardView: View {
         }
     }
 
+    private var balanceCard: some View {
+        let myEntries = balanceEntries.filter { $0.student?.id == activeStudent?.id }
+        let summary = BalanceLedger.summarize(entries: myEntries)
+        return Group {
+            if !myEntries.isEmpty {
+                NavigationLink {
+                    BalanceLedgerView()
+                } label: {
+                    VStack(alignment: .leading, spacing: 6) {
+                        HStack {
+                            Text("Available now").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+                            Spacer()
+                            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.secondary)
+                        }
+                        Text(summary.availableBalance.formatted(.currency(code: "USD")))
+                            .font(.title.bold().monospacedDigit())
+                            .foregroundStyle(summary.availableBalance < 0 ? .red : .primary)
+                        if summary.pendingClaims > 0 {
+                            Text("\(summary.pendingClaims.formatted(.currency(code: "USD"))) in pending claims")
+                                .font(.caption)
+                                .foregroundStyle(.orange)
+                        }
+                    }
+                    .frame(maxWidth: .infinity, alignment: .leading)
+                    .padding(16)
+                    .background(Color.accentColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
     private var needsAttentionCard: some View {
         let onHold = myClaims.filter { $0.status == .onHold }
         let incomplete = myExpenses.filter { e in !e.readinessChecklist.isComplete && e.claim != nil && (e.claim?.status == .draft || e.claim?.status == .readyToSubmit) }
@@ -155,22 +189,60 @@ struct DashboardView: View {
     }
 
     private var deadlineCard: some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text("Submission deadline").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-            if let due = nextSubmissionDeadline() {
-                let days = Calendar.current.dateComponents([.day], from: .now, to: due).day ?? 0
-                Text("\(days) days until July 31 deadline")
-                    .font(.subheadline)
-                    .foregroundStyle(days < 30 ? .orange : .primary)
-                Text(due.formatted(date: .long, time: .omitted))
-                    .font(.caption2).foregroundStyle(.secondary)
-            } else {
-                Text("—").font(.subheadline)
+        VStack(alignment: .leading, spacing: 8) {
+            Text("Key dates this year").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
+            ForEach(deadlines(), id: \.label) { item in
+                HStack {
+                    Image(systemName: item.icon)
+                        .foregroundStyle(item.tint)
+                    VStack(alignment: .leading, spacing: 0) {
+                        Text(item.label).font(.subheadline)
+                        Text(item.subline)
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Text("\(item.daysAway)d")
+                        .font(.caption.bold().monospacedDigit())
+                        .foregroundStyle(item.tint)
+                }
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
+    }
+
+    private struct DeadlineItem {
+        let label: String
+        let subline: String
+        let icon: String
+        let tint: Color
+        let daysAway: Int
+    }
+
+    private func deadlines() -> [DeadlineItem] {
+        let label = RulesetLoader.shared.schoolYearLabel
+        let parts = label.split(separator: "-")
+        guard parts.count == 2, let start = Int(parts[0]) else { return [] }
+        let endYear = start + 1
+        func make(_ m: Int, _ d: Int, _ label: String, _ subline: String, _ icon: String) -> DeadlineItem? {
+            var c = DateComponents(); c.year = endYear; c.month = m; c.day = d
+            guard let date = Calendar.current.date(from: c), date >= .now else { return nil }
+            let days = Calendar.current.dateComponents([.day], from: .now, to: date).day ?? 0
+            let tint: Color
+            switch days {
+            case ..<7:  tint = .red
+            case ..<30: tint = .orange
+            default:    tint = .primary
+            }
+            return DeadlineItem(label: label, subline: subline, icon: icon, tint: tint, daysAway: days)
+        }
+        return [
+            make(5, 29, "Pre-auth cutoff", "May 29 — last day to submit pre-auth requests", "checkmark.shield"),
+            make(6, 30, "Spend cliff", "June 30 — purchases must occur by this date", "calendar.badge.exclamationmark"),
+            make(7, 31, "Submission cliff", "July 31 — reimbursement deadline, no extensions", "tray.and.arrow.up.fill")
+        ].compactMap { $0 }
     }
 
     private var claimsSummaryCard: some View {

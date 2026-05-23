@@ -16,6 +16,10 @@ struct RootView: View {
 }
 
 struct MainTabView: View {
+    private var isDevTools: Bool {
+        CommandLine.arguments.contains("--devtools")
+    }
+
     var body: some View {
         TabView {
             DashboardView()
@@ -32,6 +36,11 @@ struct MainTabView: View {
 
             MoreMenuView()
                 .tabItem { Label("More", systemImage: "ellipsis.circle") }
+
+            if isDevTools {
+                DevOCRTesterView()
+                    .tabItem { Label("DevOCR", systemImage: "wrench.and.screwdriver") }
+            }
         }
     }
 }
@@ -41,6 +50,15 @@ struct MoreMenuView: View {
     var body: some View {
         NavigationStack {
             List {
+                NavigationLink { BalanceLedgerView() } label: {
+                    Label("Balance", systemImage: "dollarsign.circle")
+                }
+                NavigationLink { ProviderListView() } label: {
+                    Label("Providers", systemImage: "person.text.rectangle")
+                }
+                NavigationLink { PreAuthListView() } label: {
+                    Label("Pre-authorizations", systemImage: "checkmark.shield")
+                }
                 NavigationLink { ReportsView() } label: {
                     Label("Reports & export", systemImage: "chart.bar.doc.horizontal")
                 }

@@ -11,6 +11,8 @@ struct StudentFormView: View {
     @Binding var schoolYear: String
     @Binding var awardAmountText: String
     @Binding var notes: String
+    /// PEP-only: when the Student Learning Plan was approved.
+    var slpApprovedDate: Binding<Date?>? = nil
 
     var body: some View {
         Form {
@@ -48,6 +50,29 @@ struct StudentFormView: View {
                 Text("Enter the award amount you've been told to expect. ScholarKeep does not connect to EMA/SMP — this is your own record.")
             }
 
+            if program == .pep, let slpBinding = slpApprovedDate {
+                Section {
+                    Toggle("SLP has been approved", isOn: Binding(
+                        get: { slpBinding.wrappedValue != nil },
+                        set: { newValue in
+                            slpBinding.wrappedValue = newValue ? (slpBinding.wrappedValue ?? .now) : nil
+                        }
+                    ))
+                    if let unwrapped = slpBinding.wrappedValue {
+                        DatePicker("Approved on",
+                                   selection: Binding(
+                                    get: { unwrapped },
+                                    set: { slpBinding.wrappedValue = $0 }
+                                   ),
+                                   displayedComponents: .date)
+                    }
+                } header: {
+                    Text("Student Learning Plan (PEP)")
+                } footer: {
+                    Text("Any purchase made before the SLP is approved is permanently ineligible under PEP. There is no appeals process for this — set the approval date carefully.")
+                }
+            }
+
             Section("Notes") {
                 TextField("Notes", text: $notes, axis: .vertical)
                     .lineLimit(3...6)
@@ -66,6 +91,7 @@ struct StudentFormDraft {
     var schoolYear: String = SchoolYear.label()
     var awardAmountText: String = ""
     var notes: String = ""
+    var slpApprovedDate: Date? = nil
 
     var isValid: Bool {
         !displayName.trimmingCharacters(in: .whitespaces).isEmpty &&
@@ -91,6 +117,7 @@ struct StudentFormDraft {
             self.awardAmountText = NSDecimalNumber(decimal: amount).stringValue
         }
         self.notes = student.notes
+        self.slpApprovedDate = student.slpApprovedDate
     }
 
     func apply(to student: Student) {
@@ -102,6 +129,7 @@ struct StudentFormDraft {
         student.schoolYear = schoolYear.trimmingCharacters(in: .whitespaces)
         student.awardAmount = awardAmount
         student.notes = notes
+        student.slpApprovedDate = (program == .pep) ? slpApprovedDate : nil
     }
 
     func newStudent() -> Student {
@@ -113,7 +141,8 @@ struct StudentFormDraft {
             county: county.trimmingCharacters(in: .whitespaces),
             schoolYear: schoolYear.trimmingCharacters(in: .whitespaces),
             awardAmount: awardAmount,
-            notes: notes
+            notes: notes,
+            slpApprovedDate: (program == .pep) ? slpApprovedDate : nil
         )
     }
 }

@@ -16,7 +16,10 @@ struct ExpenseDetailView: View {
             headerSection
             eligibilitySection
             checklistSection
+            documentationConfirmationSection
             attachmentsSection
+            providerPreAuthSection
+            refundsSection
             lineItemsSection
             claimSection
             metaSection
@@ -121,6 +124,153 @@ struct ExpenseDetailView: View {
             Text(checklist.isComplete
                  ? "All required documentation is in place. You can mark this Ready to Submit from the claim screen."
                  : "Complete every applicable item before marking the claim Ready to Submit.")
+        }
+    }
+
+    @ViewBuilder
+    private var documentationConfirmationSection: some View {
+        Section {
+            if expense.paymentMethod == .card {
+                HStack {
+                    Text("Card last 4")
+                    Spacer()
+                    TextField("####", text: Binding(
+                        get: { expense.cardLast4 ?? "" },
+                        set: { newValue in
+                            let digits = newValue.filter { $0.isNumber }.prefix(4)
+                            expense.cardLast4 = digits.isEmpty ? nil : String(digits)
+                            try? modelContext.save()
+                        }
+                    ))
+                    .keyboardType(.numberPad)
+                    .multilineTextAlignment(.trailing)
+                    .frame(width: 80)
+                }
+            }
+            Toggle("No insurance / HSA / school readiness paid any portion", isOn: Binding(
+                get: { expense.noDoubleDipConfirmed },
+                set: { expense.noDoubleDipConfirmed = $0; try? modelContext.save() }
+            ))
+            if expense.paidInFull == false {
+                Label("Marked NOT paid in full — this may not be reimbursable yet (theme parks must be paid in full).", systemImage: "exclamationmark.triangle")
+                    .font(.caption)
+                    .foregroundStyle(.orange)
+            }
+            Toggle("Paid in full", isOn: Binding(
+                get: { expense.paidInFull },
+                set: { expense.paidInFull = $0; try? modelContext.save() }
+            ))
+        } header: {
+            Text("Submission gates")
+        } footer: {
+            Text(expense.paymentMethod == .card
+                 ? "Card last-4 is the #1 cited reason claims get put on hold. Always add it."
+                 : "If you submit a card receipt, your card's last 4 digits must be visible on either the receipt or the bank statement.")
+        }
+    }
+
+    private var providerPreAuthSection: some View {
+        Section("Provider & pre-auth") {
+            if let p = expense.provider {
+                HStack {
+                    Image(systemName: "person.text.rectangle").foregroundStyle(.tint)
+                    VStack(alignment: .leading) {
+                        Text(p.name).font(.subheadline)
+                        Text("\(p.type.displayName) · \(p.licenseNumber.isEmpty ? "no license #" : p.licenseNumber)")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Clear") {
+                        expense.provider = nil
+                        try? modelContext.save()
+                    }
+                    .font(.caption)
+                }
+            } else if let student = expense.student, !student.providers.isEmpty {
+                Picker("Provider", selection: Binding(
+                    get: { expense.provider?.id },
+                    set: { newID in
+                        expense.provider = student.providers.first { $0.id == newID }
+                        try? modelContext.save()
+                    }
+                )) {
+                    Text("None").tag(UUID?.none)
+                    ForEach(student.providers) { p in
+                        Text(p.name).tag(UUID?.some(p.id))
+                    }
+                }
+            }
+            if let pa = expense.preAuthorization {
+                HStack {
+                    Image(systemName: pa.status.systemImageName).foregroundStyle(.tint)
+                    VStack(alignment: .leading) {
+                        Text(pa.itemDescription).font(.subheadline)
+                        Text(pa.approvedNumber.isEmpty ? pa.status.displayName : "\(pa.status.displayName) · \(pa.approvedNumber)")
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Button("Clear") {
+                        expense.preAuthorization = nil
+                        try? modelContext.save()
+                    }
+                    .font(.caption)
+                }
+            } else if let student = expense.student, !student.preAuthorizations.isEmpty {
+                Picker("Pre-authorization", selection: Binding(
+                    get: { expense.preAuthorization?.id },
+                    set: { newID in
+                        expense.preAuthorization = student.preAuthorizations.first { $0.id == newID }
+                        try? modelContext.save()
+                    }
+                )) {
+                    Text("None").tag(UUID?.none)
+                    ForEach(student.preAuthorizations) { pa in
+                        Text(pa.itemDescription).tag(UUID?.some(pa.id))
+                    }
+                }
+            }
+        }
+    }
+
+    private var refundsSection: some View {
+        Section {
+            ForEach(expense.refunds) { refund in
+                HStack {
+                    VStack(alignment: .leading) {
+                        Text(refund.reason.isEmpty ? "Refund" : refund.reason)
+                            .font(.subheadline)
+                        Text(refund.refundDate.formatted(date: .abbreviated, time: .omitted))
+                            .font(.caption2).foregroundStyle(.secondary)
+                    }
+                    Spacer()
+                    Text("-\(refund.refundAmount.formatted(.currency(code: expense.currency)))")
+                        .foregroundStyle(.red)
+                        .monospacedDigit()
+                }
+            }
+            .onDelete { offsets in
+                for i in offsets { modelContext.delete(expense.refunds[i]) }
+                try? modelContext.save()
+            }
+            Button {
+                let r = Refund(refundDate: .now, refundAmount: 0, reason: "Refund")
+                expense.refunds.append(r)
+                try? modelContext.save()
+            } label: {
+                Label("Add a refund / return / rebate", systemImage: "arrow.uturn.backward.circle")
+            }
+            if expense.refundedAmount > 0 {
+                HStack {
+                    Text("Net reimbursable")
+                    Spacer()
+                    Text(expense.netReimbursableAmount.formatted(.currency(code: expense.currency)))
+                        .bold().monospacedDigit()
+                }
+            }
+        } header: {
+            Text("Refunds / returns")
+        } footer: {
+            Text("ESA rules prohibit reimbursing the portion of an expense that was returned or refunded. Logging the refund reduces the eligible amount automatically.")
         }
     }
 
