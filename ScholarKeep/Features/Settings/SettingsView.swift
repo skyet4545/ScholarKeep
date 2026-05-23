@@ -19,18 +19,39 @@ struct SettingsView: View {
     @State private var exportError: String?
     @State private var showDeleteConfirm = false
     @State private var showDeleteSecondConfirm = false
+    @State private var showPaywall = false
+    @State private var subs = SubscriptionService.shared
 
     var body: some View {
         @Bindable var bindableSettings = settings
         NavigationStack {
             Form {
+                subscriptionSection
                 privacySection
                 Section {
-                    Toggle(isOn: $bindableSettings.iCloudBackupEnabled) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Back up to iCloud")
-                            Text("Preference saved. Full iCloud sync lands in v0.2 once the CloudKit container is provisioned.")
-                                .font(.footnote).foregroundStyle(.secondary)
+                    Toggle(isOn: Binding(
+                        get: { bindableSettings.iCloudBackupEnabled && subs.isPro },
+                        set: { newValue in
+                            if newValue && !subs.isPro {
+                                showPaywall = true
+                            } else {
+                                bindableSettings.iCloudBackupEnabled = newValue
+                            }
+                        }
+                    )) {
+                        HStack {
+                            VStack(alignment: .leading, spacing: 2) {
+                                Text("Back up to iCloud")
+                                Text("Preference saved. Pro required to enable sync.")
+                                    .font(.footnote).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            if !subs.isPro {
+                                Text("PRO").font(.caption2.bold())
+                                    .padding(.horizontal, 6).padding(.vertical, 2)
+                                    .background(Color.accentColor, in: Capsule())
+                                    .foregroundStyle(.white)
+                            }
                         }
                     }
                 } header: { Text("Backup") } footer: {
@@ -77,6 +98,26 @@ struct SettingsView: View {
             ) {
                 Button("Delete everything", role: .destructive) { deleteAll() }
                 Button("Cancel", role: .cancel) { }
+            }
+            .paywallSheet(isPresented: $showPaywall)
+        }
+    }
+
+    private var subscriptionSection: some View {
+        Section("Subscription") {
+            if subs.isPro {
+                Label("Pro is active", systemImage: "checkmark.seal.fill")
+                    .foregroundStyle(.green)
+                Link(destination: URL(string: "https://apps.apple.com/account/subscriptions")!) {
+                    Label("Manage subscription", systemImage: "arrow.up.right.square")
+                }
+            } else {
+                Button {
+                    showPaywall = true
+                } label: {
+                    Label("Upgrade to Pro", systemImage: "graduationcap.fill")
+                        .foregroundStyle(.tint)
+                }
             }
         }
     }
@@ -167,6 +208,7 @@ struct SettingsView: View {
         }
     }
 
+    @ViewBuilder
     private var aboutSection: some View {
         Section("About") {
             Button("View disclaimer") { showDisclaimer = true }
@@ -175,6 +217,31 @@ struct SettingsView: View {
             if let phone = RulesetLoader.shared.ruleset?.globalRules.stepUpSupportPhone, let url = URL(string: "tel:\(phone.filter { $0.isNumber || $0 == "+" })") {
                 Link(destination: url) {
                     LabeledContent("Step Up support", value: phone)
+                }
+            }
+        }
+        accountSection
+    }
+
+    private var accountSection: some View {
+        Section("Account") {
+            if case .signedIn(let user) = AuthService.shared.state {
+                LabeledContent("Signed in as") {
+                    VStack(alignment: .trailing) {
+                        if let given = user.givenName, let family = user.familyName {
+                            Text("\(given) \(family)").font(.subheadline)
+                        }
+                        if let email = user.email {
+                            Text(email).font(.caption).foregroundStyle(.secondary)
+                        } else {
+                            Text("Apple ID").font(.caption).foregroundStyle(.secondary)
+                        }
+                    }
+                }
+                Button(role: .destructive) {
+                    Task { @MainActor in AuthService.shared.signOut() }
+                } label: {
+                    Label("Sign out", systemImage: "rectangle.portrait.and.arrow.right")
                 }
             }
         }
@@ -214,6 +281,10 @@ struct SettingsView: View {
     }
 
     private func exportAll() {
+        guard subs.isPro else {
+            showPaywall = true
+            return
+        }
         exportingAll = true
         Task {
             do {

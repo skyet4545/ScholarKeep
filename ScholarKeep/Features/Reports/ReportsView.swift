@@ -14,6 +14,8 @@ struct ReportsView: View {
     @State private var schoolYearFilter: String? = nil
     @State private var exportURL: URL?
     @State private var exportError: String?
+    @State private var showPaywall = false
+    @State private var subs = SubscriptionService.shared
 
     private var visibleExpenses: [Expense] {
         var list = allExpenses
@@ -157,7 +159,17 @@ struct ReportsView: View {
 
     private var exportCard: some View {
         VStack(alignment: .leading, spacing: 10) {
-            Text("Export").font(.caption.bold()).foregroundStyle(.secondary)
+            HStack {
+                Text("Export").font(.caption.bold()).foregroundStyle(.secondary)
+                Spacer()
+                if !subs.isPro {
+                    Text("PRO")
+                        .font(.caption2.bold())
+                        .padding(.horizontal, 6).padding(.vertical, 2)
+                        .background(Color.accentColor, in: Capsule())
+                        .foregroundStyle(.white)
+                }
+            }
             Button {
                 exportCSV()
             } label: {
@@ -172,13 +184,23 @@ struct ReportsView: View {
             if let exportError {
                 Text(exportError).foregroundStyle(.red).font(.caption)
             }
+            if !subs.isPro {
+                Text("CSV and PDF exports are a Pro feature. Tap to learn more.")
+                    .font(.caption2)
+                    .foregroundStyle(.secondary)
+            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(16)
         .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+        .paywallSheet(isPresented: $showPaywall)
     }
 
     private func exportCSV() {
+        guard subs.isPro else {
+            showPaywall = true
+            return
+        }
         do {
             exportURL = try CSVExportService.exportExpenses(visibleExpenses)
             exportError = nil

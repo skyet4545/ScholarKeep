@@ -4,7 +4,23 @@ import SwiftData
 struct RootView: View {
     @Environment(AppSettings.self) private var settings
 
+    private var bypassAuth: Bool {
+        CommandLine.arguments.contains("--reset") ||
+        CommandLine.arguments.contains("--skip-auth")
+    }
+
     var body: some View {
+        Group {
+            if bypassAuth {
+                gatedContent
+            } else {
+                SignInGate { gatedContent }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private var gatedContent: some View {
         AppLockGate {
             if settings.hasCompletedOnboarding {
                 MainTabView()

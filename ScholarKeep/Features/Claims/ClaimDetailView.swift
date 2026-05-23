@@ -292,17 +292,19 @@ struct AdvanceClaimSheet: View {
     }
 }
 
-/// Placeholder until M5 export sheet is wired in fully.
 struct ExportClaimSheet: View {
     @Environment(\.dismiss) private var dismiss
     let claim: Claim
     @State private var resultURL: URL?
     @State private var error: String?
+    @State private var subs = SubscriptionService.shared
 
     var body: some View {
         NavigationStack {
             Group {
-                if let resultURL {
+                if !subs.isPro {
+                    paywallTeaser
+                } else if let resultURL {
                     ShareLink(item: resultURL) {
                         Label("Share submission package PDF", systemImage: "square.and.arrow.up")
                     }
@@ -318,8 +320,15 @@ struct ExportClaimSheet: View {
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) { Button("Done") { dismiss() } }
             }
-            .task { generate() }
+            .task {
+                await subs.refreshEntitlements()
+                if subs.isPro { generate() }
+            }
         }
+    }
+
+    private var paywallTeaser: some View {
+        PaywallView()
     }
 
     private func generate() {
