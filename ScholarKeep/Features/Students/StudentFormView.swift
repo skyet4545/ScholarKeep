@@ -75,7 +75,7 @@ struct StudentFormDraft {
     var awardAmount: Decimal? {
         let trimmed = awardAmountText.trimmingCharacters(in: .whitespaces)
         guard !trimmed.isEmpty else { return nil }
-        return Decimal(string: trimmed)
+        return DecimalParsing.parse(trimmed)
     }
 
     init() {}

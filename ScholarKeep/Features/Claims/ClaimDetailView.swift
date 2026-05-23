@@ -207,7 +207,7 @@ struct ClaimDetailView: View {
             },
             set: { newValue in
                 let trimmed = newValue.trimmingCharacters(in: .whitespaces)
-                claim[keyPath: keyPath] = trimmed.isEmpty ? nil : Decimal(string: trimmed)
+                claim[keyPath: keyPath] = trimmed.isEmpty ? nil : DecimalParsing.parse(trimmed)
                 try? modelContext.save()
             }
         )
@@ -275,6 +275,10 @@ struct AdvanceClaimSheet: View {
                         do {
                             _ = try ClaimStateMachine.transition(claim, to: selectedStatus, note: note, date: date)
                             try modelContext.save()
+                            // Side effects that need async/external services:
+                            if selectedStatus == .onHold {
+                                Task { await NotificationsService.scheduleOnHoldClock(for: claim) }
+                            }
                             onError(nil)
                             dismiss()
                         } catch {

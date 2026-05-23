@@ -2,8 +2,10 @@ import SwiftUI
 import SwiftData
 import PhotosUI
 import UIKit
+import VisionKit
 
 /// Orchestrates a single capture: scan → OCR → review.
+/// Handles three sources: VisionKit scanner, photo library, manual entry.
 struct CaptureFlowView: View {
     enum Source { case scanner, photoLibrary }
 
@@ -12,6 +14,8 @@ struct CaptureFlowView: View {
     let source: Source
 
     @State private var showScanner = false
+    @State private var showPhotoPicker = false
+    @State private var scannerUnavailable = false
     @State private var photoItem: PhotosPickerItem?
     @State private var images: [UIImage] = []
     @State private var parsed: ParsedReceipt?
@@ -32,13 +36,9 @@ struct CaptureFlowView: View {
                 ProgressView("Reading receipt…")
                     .frame(maxWidth: .infinity, maxHeight: .infinity)
             } else if let processingError {
-                VStack(spacing: 16) {
-                    Image(systemName: "exclamationmark.triangle")
-                        .font(.largeTitle)
-                        .foregroundStyle(.red)
-                    Text(processingError).multilineTextAlignment(.center).padding()
-                    Button("Done") { dismiss() }
-                }
+                errorView(processingError)
+            } else if scannerUnavailable {
+                scannerUnavailableView
             } else {
                 Color.clear
             }
@@ -54,31 +54,69 @@ struct CaptureFlowView: View {
             }
             .ignoresSafeArea()
         }
-        .photosPicker(isPresented: photoPickerBinding, selection: $photoItem, matching: .images)
+        .photosPicker(isPresented: $showPhotoPicker, selection: $photoItem, matching: .images)
+        .onChange(of: showPhotoPicker) { _, isShowing in
+            // User dismissed the picker without choosing → close the capture flow.
+            if !isShowing && photoItem == nil && images.isEmpty && parsed == nil && !isProcessing {
+                dismiss()
+            }
+        }
         .onChange(of: photoItem) { _, newItem in
             guard let newItem else { return }
             Task {
                 if let data = try? await newItem.loadTransferable(type: Data.self),
                    let image = UIImage(data: data) {
-                    processImages([image])
+                    await MainActor.run { processImages([image]) }
                 } else {
-                    dismiss()
+                    await MainActor.run { dismiss() }
                 }
             }
         }
         .onAppear {
             switch source {
-            case .scanner:       showScanner = true
-            case .photoLibrary:  photoItem = nil
+            case .scanner:
+                if VNDocumentCameraViewController.isSupported {
+                    showScanner = true
+                } else {
+                    scannerUnavailable = true
+                }
+            case .photoLibrary:
+                showPhotoPicker = true
             }
         }
     }
 
-    private var photoPickerBinding: Binding<Bool> {
-        Binding(
-            get: { source == .photoLibrary && photoItem == nil && images.isEmpty && parsed == nil && !isProcessing },
-            set: { _ in }
-        )
+    private func errorView(_ message: String) -> some View {
+        VStack(spacing: 16) {
+            Image(systemName: "exclamationmark.triangle")
+                .font(.largeTitle)
+                .foregroundStyle(.red)
+            Text(message).multilineTextAlignment(.center).padding()
+            Button("Done") { dismiss() }
+                .buttonStyle(.borderedProminent)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
+
+    private var scannerUnavailableView: some View {
+        VStack(spacing: 16) {
+            Image(systemName: "camera.metering.unknown")
+                .font(.largeTitle)
+                .foregroundStyle(.secondary)
+            Text("Camera scanning isn't available on this device").font(.headline)
+            Text("Pick a receipt image from your photo library or add the expense manually.")
+                .multilineTextAlignment(.center)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, 24)
+            Button("Pick from library") {
+                scannerUnavailable = false
+                showPhotoPicker = true
+            }
+            .buttonStyle(.borderedProminent)
+            Button("Cancel", role: .cancel) { dismiss() }
+        }
+        .padding()
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
     private func processImages(_ imgs: [UIImage]) {

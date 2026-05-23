@@ -19,6 +19,7 @@ final class Expense {
 
     var eligibilityResultRaw: String?
     var eligibilityReason: String
+    var eligibilityReasonsList: [String]
     var matchedRuleKeys: [String]
     var eligibilityCheckedAt: Date?
     var rulesetVersion: String?
@@ -52,6 +53,7 @@ final class Expense {
         acquisitionPath: AcquisitionPath = .reimbursement,
         eligibilityResult: EligibilityStatus? = nil,
         eligibilityReason: String = "",
+        eligibilityReasonsList: [String] = [],
         matchedRuleKeys: [String] = [],
         eligibilityCheckedAt: Date? = nil,
         rulesetVersion: String? = nil,
@@ -80,6 +82,7 @@ final class Expense {
         self.acquisitionPathRaw = acquisitionPath.rawValue
         self.eligibilityResultRaw = eligibilityResult?.rawValue
         self.eligibilityReason = eligibilityReason
+        self.eligibilityReasonsList = eligibilityReasonsList
         self.matchedRuleKeys = matchedRuleKeys
         self.eligibilityCheckedAt = eligibilityCheckedAt
         self.rulesetVersion = rulesetVersion

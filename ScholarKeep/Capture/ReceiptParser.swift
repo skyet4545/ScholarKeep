@@ -38,14 +38,30 @@ enum ReceiptParser {
     // MARK: Vendor
 
     private static func inferVendor(from lines: [String]) -> String? {
-        // First few non-empty lines that aren't pure numbers / known headers.
-        let skipPrefixes = ["receipt", "invoice", "store #", "tel:", "phone", "www.", "http"]
-        for raw in lines.prefix(6) {
+        // First few non-empty lines that aren't pure numbers, addresses, or headers.
+        let skipPrefixes = ["receipt", "invoice", "store #", "tel:", "phone", "www.", "http", "order #"]
+        // Street-address suffix tokens (lower-cased, with optional period stripped).
+        let addressTokens = Set(["street", "st", "avenue", "ave", "boulevard", "blvd", "road", "rd",
+                                  "drive", "dr", "lane", "ln", "court", "ct", "way", "circle", "cir",
+                                  "place", "pl", "highway", "hwy", "parkway", "pkwy", "suite", "ste"])
+        for raw in lines.prefix(8) {
             let trimmed = raw.trimmingCharacters(in: .whitespacesAndNewlines)
             guard !trimmed.isEmpty else { continue }
             let lower = trimmed.lowercased()
             if skipPrefixes.contains(where: { lower.hasPrefix($0) }) { continue }
             if trimmed.range(of: "^[\\d\\s\\-\\.,$#]+$", options: .regularExpression) != nil { continue }
+            // Skip if it looks like an address: starts with a number AND contains a street token.
+            let tokens = lower
+                .replacingOccurrences(of: ",", with: " ")
+                .replacingOccurrences(of: ".", with: " ")
+                .split(separator: " ")
+                .map(String.init)
+            let startsWithNumber = tokens.first?.first?.isNumber == true
+            let hasAddressToken = tokens.contains(where: { addressTokens.contains($0) })
+            if startsWithNumber && hasAddressToken { continue }
+            // Skip phone-like (has 7+ digits)
+            let digits = trimmed.filter { $0.isNumber }.count
+            if digits >= 7 { continue }
             return trimmed
         }
         return lines.first?.trimmingCharacters(in: .whitespacesAndNewlines)

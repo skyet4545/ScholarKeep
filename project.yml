@@ -10,8 +10,8 @@ options:
 
 settings:
   base:
-    MARKETING_VERSION: "0.1.0"
-    CURRENT_PROJECT_VERSION: "1"
+    MARKETING_VERSION: "0.1.1"
+    CURRENT_PROJECT_VERSION: "2"
     SWIFT_VERSION: "5.9"
     DEVELOPMENT_TEAM: "846N5D6TMK"
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
@@ -64,13 +64,28 @@ targets:
         GENERATE_INFOPLIST_FILE: YES
         BUNDLE_LOADER: "$(TEST_HOST)"
         TEST_HOST: "$(BUILT_PRODUCTS_DIR)/ScholarKeep.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/ScholarKeep"
+  ScholarKeepUITests:
+    type: bundle.ui-testing
+    platform: iOS
+    sources:
+      - path: Tests/ScholarKeepUITests
+    dependencies:
+      - target: ScholarKeep
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlosreyes.scholarkeep.uitests
+        GENERATE_INFOPLIST_FILE: YES
+        TEST_TARGET_NAME: ScholarKeep
+
 schemes:
   ScholarKeep:
     build:
       targets:
         ScholarKeep: all
         ScholarKeepTests: [test]
+        ScholarKeepUITests: [test]
     test:
       targets:
         - ScholarKeepTests
+        - ScholarKeepUITests
       gatherCoverageData: true

@@ -1,6 +1,7 @@
 import SwiftUI
 import SwiftData
 import UniformTypeIdentifiers
+import UserNotifications
 
 struct SettingsView: View {
     @Environment(AppSettings.self) private var settings
@@ -235,5 +236,3 @@ struct SettingsView: View {
         Task { await NotificationsService.cancelAll() }
     }
 }
-
-import UserNotifications

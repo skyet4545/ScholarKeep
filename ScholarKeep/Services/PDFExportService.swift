@@ -23,6 +23,8 @@ enum PDFExportService {
     // MARK: PDF rendering
 
     private static let pageRect = CGRect(x: 0, y: 0, width: 612, height: 792) // US Letter
+    private static let bottomMargin: CGFloat = 36
+    private static let pageBottom: CGFloat = 792 - 36
 
     private static func renderExpensePDF(_ expense: Expense) -> Data {
         let format = UIGraphicsPDFRendererFormat()
@@ -36,12 +38,11 @@ enum PDFExportService {
             var y: CGFloat = 36
             drawTitle("Submission package — \(expense.vendorName.isEmpty ? "Expense" : expense.vendorName)", at: &y)
             drawDisclaimerHeader(at: &y)
-            drawExpenseSummary(expense, at: &y)
-            drawChecklist(expense.readinessChecklist, at: &y)
-            // Attachment pages
-            for (idx, attachment) in expense.attachments.enumerated() {
+            drawExpenseSummary(expense, at: &y, ctx: ctx)
+            drawChecklist(expense.readinessChecklist, at: &y, ctx: ctx)
+            for attachment in expense.attachments {
                 ctx.beginPage()
-                drawAttachmentPage(attachment, index: idx)
+                drawAttachmentPage(attachment, ctx: ctx)
             }
         }
     }
@@ -58,18 +59,26 @@ enum PDFExportService {
             var y: CGFloat = 36
             drawTitle("Claim — \(claim.title)", at: &y)
             drawDisclaimerHeader(at: &y)
-            drawClaimSummary(claim, at: &y)
+            drawClaimSummary(claim, at: &y, ctx: ctx)
             for expense in claim.expenses {
                 ctx.beginPage()
                 var ey: CGFloat = 36
-                drawTitle("Expense — \(expense.vendorName)", at: &ey)
-                drawExpenseSummary(expense, at: &ey)
-                drawChecklist(expense.readinessChecklist, at: &ey)
+                drawTitle("Expense — \(expense.vendorName.isEmpty ? "—" : expense.vendorName)", at: &ey)
+                drawExpenseSummary(expense, at: &ey, ctx: ctx)
+                drawChecklist(expense.readinessChecklist, at: &ey, ctx: ctx)
                 for attachment in expense.attachments {
                     ctx.beginPage()
-                    drawAttachmentPage(attachment, index: 0)
+                    drawAttachmentPage(attachment, ctx: ctx)
                 }
             }
+        }
+    }
+
+    /// Begin a new page + reset y if we're about to overflow.
+    private static func ensureRoom(_ minHeight: CGFloat, _ y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
+        if y + minHeight > pageBottom {
+            ctx.beginPage()
+            y = 36
         }
     }
 
@@ -94,7 +103,7 @@ enum PDFExportService {
         y += height + 8
     }
 
-    private static func drawExpenseSummary(_ expense: Expense, at y: inout CGFloat) {
+    private static func drawExpenseSummary(_ expense: Expense, at y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
         let rows: [(String, String)] = [
             ("Vendor", expense.vendorName),
             ("Date", expense.purchaseDate.formatted(date: .long, time: .omitted)),
@@ -110,26 +119,32 @@ enum PDFExportService {
             ("Program", expense.student?.program.displayName ?? "—")
         ]
         for (k, v) in rows {
+            ensureRoom(20, &y, ctx: ctx)
             drawKeyValue(k, v, at: &y)
         }
         if !expense.eligibilityReason.isEmpty {
+            ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Eligibility reason", at: &y)
             drawParagraph(expense.eligibilityReason, at: &y)
         }
         if !expense.lineItems.isEmpty {
+            ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Line items", at: &y)
             for item in expense.lineItems {
+                ensureRoom(20, &y, ctx: ctx)
                 drawKeyValue(item.descriptionText, item.amount.formatted(.currency(code: expense.currency)), at: &y)
             }
         }
         if !expense.notes.isEmpty {
+            ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Notes", at: &y)
             drawParagraph(expense.notes, at: &y)
         }
         if !expense.educationalBenefitNote.isEmpty {
+            ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Educational benefit", at: &y)
             drawParagraph(expense.educationalBenefitNote, at: &y)
@@ -137,7 +152,7 @@ enum PDFExportService {
         drawRule(at: &y)
     }
 
-    private static func drawClaimSummary(_ claim: Claim, at y: inout CGFloat) {
+    private static func drawClaimSummary(_ claim: Claim, at y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
         let total = claim.expenses.reduce(Decimal(0)) { $0 + $1.total }
         let rows: [(String, String)] = [
             ("Title", claim.title),
@@ -153,21 +168,25 @@ enum PDFExportService {
             ("Expense count", "\(claim.expenses.count)")
         ]
         for (k, v) in rows {
+            ensureRoom(20, &y, ctx: ctx)
             drawKeyValue(k, v, at: &y)
         }
         if !claim.denialNote.isEmpty {
+            ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Denial note", at: &y)
             drawParagraph(claim.denialNote, at: &y)
         }
         if !claim.appealNote.isEmpty {
+            ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Appeal note", at: &y)
             drawParagraph(claim.appealNote, at: &y)
         }
     }
 
-    private static func drawChecklist(_ checklist: ReadinessChecklist, at y: inout CGFloat) {
+    private static func drawChecklist(_ checklist: ReadinessChecklist, at y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
+        ensureRoom(80, &y, ctx: ctx)
         drawSubtitle("Documentation readiness", at: &y)
         let rows: [(String, Bool?)] = [
             ("Itemized receipt", checklist.itemizedReceipt),
@@ -179,6 +198,7 @@ enum PDFExportService {
             ("No handwritten alterations", checklist.noHandwrittenAlterations)
         ]
         for (label, value) in rows {
+            ensureRoom(20, &y, ctx: ctx)
             let mark: String
             switch value {
             case .some(true):  mark = "[x]"
@@ -190,7 +210,7 @@ enum PDFExportService {
         drawRule(at: &y)
     }
 
-    private static func drawAttachmentPage(_ attachment: Attachment, index: Int) {
+    private static func drawAttachmentPage(_ attachment: Attachment, ctx: UIGraphicsPDFRendererContext) {
         let title = "\(attachment.type.displayName)"
         var y: CGFloat = 36
         drawTitle(title, at: &y)
@@ -213,11 +233,13 @@ enum PDFExportService {
                                 y: y,
                                 width: pageBounds.width * scale,
                                 height: pageBounds.height * scale)
-            UIGraphicsGetCurrentContext()?.saveGState()
-            UIGraphicsGetCurrentContext()?.translateBy(x: target.minX, y: target.minY + target.height)
-            UIGraphicsGetCurrentContext()?.scaleBy(x: scale, y: -scale)
-            page.draw(with: .mediaBox, to: UIGraphicsGetCurrentContext()!)
-            UIGraphicsGetCurrentContext()?.restoreGState()
+            if let cg = UIGraphicsGetCurrentContext() {
+                cg.saveGState()
+                cg.translateBy(x: target.minX, y: target.minY + target.height)
+                cg.scaleBy(x: scale, y: -scale)
+                page.draw(with: .mediaBox, to: cg)
+                cg.restoreGState()
+            }
         } else {
             drawParagraph("Attachment of type \(attachment.mimeType) — not rendered here. The original is stored in the app.", at: &y)
         }

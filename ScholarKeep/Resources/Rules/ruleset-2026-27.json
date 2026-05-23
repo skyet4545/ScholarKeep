@@ -1,6 +1,6 @@
 {
   "schoolYear": "2026-27",
-  "sourceVersion": "seed-draft-1",
+  "sourceVersion": "seed-draft-2",
   "lastUpdated": "2026-05-23",
   "disclaimer": "Estimates only. Confirm against the official Purchasing Guide and Family Handbook.",
   "deadlines": {
@@ -20,7 +20,7 @@
     {
       "key": "curriculum_materials",
       "displayName": "Curriculum & Instructional Materials",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["curriculum", "workbook", "textbook", "lesson", "instructional"],
       "ineligibleKeywords": [],
@@ -33,7 +33,7 @@
     {
       "key": "books",
       "displayName": "Books",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["book", "reader", "novel"],
       "ineligibleKeywords": [],
@@ -42,7 +42,7 @@
     {
       "key": "device",
       "displayName": "Digital Device (laptop / tablet / e-reader)",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["laptop", "chromebook", "tablet", "ipad", "e-reader", "desktop", "computer"],
       "ineligibleKeywords": [],
@@ -52,7 +52,7 @@
     {
       "key": "internet_subscription",
       "displayName": "In-home Internet / Digital Subscription",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["internet", "wifi", "broadband", "subscription", "app"],
       "ineligibleKeywords": ["family plan", "multi-user"],
@@ -61,7 +61,7 @@
     {
       "key": "online_course",
       "displayName": "Online Course",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["online course", "outschool", "k12", "coursera"],
       "ineligibleKeywords": [],
@@ -70,7 +70,7 @@
     {
       "key": "tutoring",
       "displayName": "Tutoring",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["tutor", "tutoring"],
       "ineligibleKeywords": [],
@@ -81,7 +81,7 @@
     {
       "key": "exam_fees",
       "displayName": "Standardized / AP / Industry Exam Fees",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["ap exam", "psat", "sat", "act", "clep", "industry certification", "test fee"],
       "ineligibleKeywords": [],
@@ -90,11 +90,12 @@
     {
       "key": "private_school_tuition",
       "displayName": "Private School Tuition & Fees",
-      "programs": ["fesUA"],
+      "programs": ["fesUA", "fesEO"],
       "eligibility": "eligible",
       "keywords": ["tuition", "private school"],
       "ineligibleKeywords": ["registration fee", "donation", "fundraising", "lunch", "before-care", "after-care"],
       "requiresStudentName": true,
+      "ineligibleForProgram": {"pep": "PEP is for students not enrolled full-time in a private school — tuition is not reimbursable."},
       "sourceCitation": "Purchasing Guide — Private School Tuition"
     },
     {
@@ -106,13 +107,16 @@
       "ineligibleKeywords": [],
       "requiresStudentName": true,
       "requiresProviderCredentials": true,
-      "ineligibleForProgram": {"pep": "PEP does not cover specialized therapies"},
+      "ineligibleForProgram": {
+        "pep": "PEP does not cover specialized therapies.",
+        "fesEO": "FES-EO does not cover specialized therapies — those are FES-UA only."
+      },
       "sourceCitation": "FES-UA — Specialized Services"
     },
     {
       "key": "evaluation_annual",
       "displayName": "Annual Evaluation by Certified Teacher",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["annual evaluation", "portfolio review", "certified teacher evaluation"],
       "requiresProviderCredentials": true,
@@ -121,7 +125,7 @@
     {
       "key": "florida_prepaid",
       "displayName": "Florida Prepaid / College Savings",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "directPayOnly",
       "keywords": ["florida prepaid", "college savings"],
       "ineligibleKeywords": [],
@@ -131,7 +135,7 @@
     {
       "key": "theme_park",
       "displayName": "Educational Theme-Park / Zoo / Museum Admission",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "needsPreAuth",
       "keywords": ["theme park", "zoo", "museum", "aquarium", "admission", "epcot", "magic kingdom", "seaworld"],
       "ineligibleKeywords": ["annual pass", "season pass", "parking", "souvenir", "food"],
@@ -151,12 +155,16 @@
       "eligibility": "eligible",
       "keywords": ["sensory", "fidget", "weighted blanket", "noise cancel"],
       "ineligibleKeywords": [],
+      "ineligibleForProgram": {
+        "pep": "Sensory materials are primarily reimbursable under FES-UA. Confirm against the PEP guide.",
+        "fesEO": "Sensory materials are primarily reimbursable under FES-UA. Confirm against the FES-EO guide."
+      },
       "sourceCitation": "Purchasing Guide — Sensory Materials"
     },
     {
       "key": "pe_enrichment",
       "displayName": "P.E. / Electives / Enrichment",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["music lesson", "art class", "swim lesson", "martial arts", "dance class", "p.e.", "pe class"],
       "ineligibleKeywords": [],
@@ -165,7 +173,7 @@
     {
       "key": "classroom_furniture",
       "displayName": "Classroom Furnishings",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "eligible",
       "keywords": ["desk", "chair", "bookshelf", "classroom furniture"],
       "ineligibleKeywords": ["sofa", "couch", "bed"],
@@ -174,7 +182,7 @@
     {
       "key": "ineligible_transport",
       "displayName": "Transportation / Gas / Mileage",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "ineligible",
       "keywords": ["gas", "fuel", "mileage", "uber", "lyft", "airfare", "transportation"],
       "ineligibleKeywords": [],
@@ -183,7 +191,7 @@
     {
       "key": "ineligible_food_lodging",
       "displayName": "Food / Lodging / Meals",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "ineligible",
       "keywords": ["lunch", "meal", "food", "hotel", "lodging", "snack"],
       "ineligibleKeywords": [],
@@ -192,7 +200,7 @@
     {
       "key": "ineligible_medical",
       "displayName": "Medical Services / Devices",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "ineligible",
       "keywords": ["hearing aid", "mobility aid", "wheelchair", "medical", "non-prescription glasses"],
       "ineligibleKeywords": [],
@@ -202,7 +210,7 @@
     {
       "key": "ineligible_tickets",
       "displayName": "Concert / Sporting / Resale Tickets, Arcades",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "ineligible",
       "keywords": ["concert", "sporting event", "resale", "stubhub", "arcade", "ticket reseller"],
       "ineligibleKeywords": [],
@@ -211,7 +219,7 @@
     {
       "key": "ineligible_household",
       "displayName": "General Household Items / Large TVs",
-      "programs": ["fesUA", "pep"],
+      "programs": ["fesUA", "fesEO", "pep"],
       "eligibility": "ineligible",
       "keywords": ["television over 55", "appliance", "household", "pool", "jacuzzi", "live animal", "scooter", "warranty"],
       "ineligibleKeywords": [],

@@ -73,11 +73,9 @@ struct AddToClaimSheet: View {
     }
 
     private func addTo(claim: Claim) {
-        // Warn if mixing vendors but allow (the spec says one provider/service per claim; surface as warning).
-        let vendors = Set((claim.expenses + [expense]).map { $0.vendorName.lowercased() })
-        if vendors.count > 1 {
-            error = "Heads up: this claim now mixes vendors (\(vendors.joined(separator: ", "))). The portal requires one provider per claim — consider splitting."
-        }
+        let vendors = Set((claim.expenses + [expense]).map { $0.vendorName.lowercased() }.filter { !$0.isEmpty })
+        let mixesVendors = vendors.count > 1
+
         expense.claim = claim
         if !claim.expenses.contains(where: { $0.id == expense.id }) {
             claim.expenses.append(expense)
@@ -86,9 +84,15 @@ struct AddToClaimSheet: View {
             let event = StatusEvent(status: .draft, date: .now, note: "Created from expense.", claim: claim)
             claim.statusEvents.append(event)
         }
+        // If we mixed vendors, leave a status note on the claim so it's visible later.
+        if mixesVendors {
+            let warning = "Heads up: this claim now mixes vendors (\(vendors.joined(separator: ", "))). The portal requires one provider per claim — consider splitting."
+            let event = StatusEvent(status: claim.status, date: .now, note: warning, claim: claim)
+            claim.statusEvents.append(event)
+        }
         do {
             try modelContext.save()
-            if error == nil { dismiss() }
+            dismiss()
         } catch {
             self.error = "Couldn't save: \(error.localizedDescription)"
         }

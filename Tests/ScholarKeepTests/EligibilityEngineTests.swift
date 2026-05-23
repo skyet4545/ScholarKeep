@@ -6,16 +6,7 @@ final class EligibilityEngineTests: XCTestCase {
     private var engine: EligibilityEngine!
 
     override func setUpWithError() throws {
-        // Load the bundled ruleset via the test bundle (loader uses Bundle.main, so we replicate here).
-        let bundle = Bundle(for: type(of: self))
-        let appBundleURL = Bundle.main.url(forResource: "ruleset-2026-27", withExtension: "json")
-            ?? bundle.url(forResource: "ruleset-2026-27", withExtension: "json")
-        guard let url = appBundleURL else {
-            throw XCTSkip("ruleset-2026-27.json not in test bundle search paths")
-        }
-        let data = try Data(contentsOf: url)
-        let ruleset = try JSONDecoder().decode(Ruleset.self, from: data)
-        engine = EligibilityEngine(ruleset: ruleset)
+        engine = try TestRuleset.engine()
     }
 
     // Appendix B test cases (descriptions + expected verdicts).

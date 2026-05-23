@@ -202,5 +202,11 @@ struct OnboardingFlow: View {
         settings.appLockEnabled = enableAppLock
         settings.iCloudBackupEnabled = enableICloud
         settings.hasCompletedOnboarding = true
+        // Schedule deadline reminders silently if user has notifications on.
+        Task {
+            if await NotificationsService.requestAuthorizationIfNeeded() {
+                await NotificationsService.scheduleSubmissionDeadline(school: RulesetLoader.shared.schoolYearLabel)
+            }
+        }
     }
 }

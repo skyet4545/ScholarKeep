@@ -2,6 +2,7 @@ import Foundation
 
 enum Program: String, Codable, CaseIterable, Identifiable {
     case fesUA
+    case fesEO
     case pep
 
     var id: String { rawValue }
@@ -9,6 +10,7 @@ enum Program: String, Codable, CaseIterable, Identifiable {
     var displayName: String {
         switch self {
         case .fesUA: return "FES-UA (Unique Abilities)"
+        case .fesEO: return "FES-EO (Educational Options, income-based)"
         case .pep:   return "PEP (Personalized Education Program)"
         }
     }
@@ -16,7 +18,20 @@ enum Program: String, Codable, CaseIterable, Identifiable {
     var shortName: String {
         switch self {
         case .fesUA: return "FES-UA"
+        case .fesEO: return "FES-EO"
         case .pep:   return "PEP"
+        }
+    }
+
+    /// One-line description used in onboarding to help the parent pick.
+    var oneLiner: String {
+        switch self {
+        case .fesUA:
+            return "Disability-based ESA (IEP or qualifying diagnosis). Broadest spending — includes specialized therapies."
+        case .fesEO:
+            return "Income-based ESA (post-HB-1 2023). Same flexible spending as PEP except students are enrolled in an approved private school."
+        case .pep:
+            return "ESA for K-12 students not enrolled full-time in public or private school (homeschool / personalized education)."
         }
     }
 }

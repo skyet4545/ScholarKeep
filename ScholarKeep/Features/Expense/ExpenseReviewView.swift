@@ -53,7 +53,7 @@ struct ExpenseReviewView: View {
                     Section { Text(saveError).foregroundStyle(.red) }
                 }
             }
-            .navigationTitle("Review receipt")
+            .navigationTitle(scannedImages.isEmpty ? "New expense" : "Review receipt")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
@@ -164,7 +164,7 @@ struct ExpenseReviewView: View {
             liveEligibility = nil
             return
         }
-        let total = Decimal(string: totalText) ?? 0
+        let total = (DecimalParsing.parse(totalText) ?? 0)
         let withinDeviceWindow = DeviceWindowChecker.studentHasRecentDevice(
             student: student,
             within: engine.ruleset.globalRules.deviceReplacementYears,
@@ -182,10 +182,10 @@ struct ExpenseReviewView: View {
     }
 
     private func save() {
-        let total = Decimal(string: totalText) ?? 0
-        let subtotal = Decimal(string: subtotalText) ?? 0
-        let tax = Decimal(string: taxText) ?? 0
-        let shipping = Decimal(string: shippingText) ?? 0
+        let total = (DecimalParsing.parse(totalText) ?? 0)
+        let subtotal = DecimalParsing.parse(subtotalText) ?? 0
+        let tax = DecimalParsing.parse(taxText) ?? 0
+        let shipping = DecimalParsing.parse(shippingText) ?? 0
 
         // Build expense (Draft).
         let expense = Expense(
@@ -200,6 +200,7 @@ struct ExpenseReviewView: View {
             acquisitionPath: acquisitionPath,
             eligibilityResult: liveEligibility?.status,
             eligibilityReason: liveEligibility?.reasons.joined(separator: " ") ?? "",
+            eligibilityReasonsList: liveEligibility?.reasons ?? [],
             matchedRuleKeys: liveEligibility?.matchedRuleKeys ?? [],
             eligibilityCheckedAt: .now,
             rulesetVersion: RulesetLoader.shared.engine?.ruleset.sourceVersion,
@@ -238,7 +239,7 @@ struct ExpenseReviewView: View {
 
         // Line items.
         for draft in lineItemDrafts {
-            let amount = Decimal(string: draft.amount) ?? 0
+            let amount = DecimalParsing.parse(draft.amount) ?? 0
             guard !draft.description.trimmingCharacters(in: .whitespaces).isEmpty else { continue }
             expense.lineItems.append(LineItem(descriptionText: draft.description, unitPrice: amount, amount: amount))
         }

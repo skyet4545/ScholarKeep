@@ -59,10 +59,9 @@ struct ExpenseDetailView: View {
     private var eligibilitySection: some View {
         Section("Eligibility") {
             if let status = expense.eligibilityResult {
-                let reasons = expense.eligibilityReason
-                    .split(separator: ".")
-                    .map { $0.trimmingCharacters(in: .whitespacesAndNewlines) + "." }
-                    .filter { $0.count > 1 }
+                let reasons = expense.eligibilityReasonsList.isEmpty
+                    ? [expense.eligibilityReason].filter { !$0.isEmpty }
+                    : expense.eligibilityReasonsList
                 let result = EligibilityResult(
                     status: status,
                     reasons: reasons,
@@ -241,6 +240,7 @@ struct ExpenseDetailView: View {
         let result = engine.evaluate(input: input)
         expense.eligibilityResult = result.status
         expense.eligibilityReason = result.reasons.joined(separator: " ")
+        expense.eligibilityReasonsList = result.reasons
         expense.matchedRuleKeys = result.matchedRuleKeys
         expense.requiresPreAuth = result.requiresPreAuth
         expense.eligibilityCheckedAt = .now

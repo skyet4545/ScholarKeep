@@ -39,7 +39,7 @@ struct PrePurchaseCheckerView: View {
                     }
                 }
                 Section {
-                    Button("Check") { runCheck() }
+                    Button("Check eligibility") { runCheck() }
                         .buttonStyle(.borderedProminent)
                         .frame(maxWidth: .infinity)
                         .disabled(activeStudent == nil || description.trimmingCharacters(in: .whitespaces).isEmpty)
@@ -69,7 +69,7 @@ struct PrePurchaseCheckerView: View {
 
     private func runCheck() {
         guard let student = activeStudent, let engine = RulesetLoader.shared.engine else { return }
-        let amount = Decimal(string: amountText) ?? 0
+        let amount = DecimalParsing.parse(amountText) ?? 0
         let withinDeviceWindow = DeviceWindowChecker.studentHasRecentDevice(
             student: student,
             within: engine.ruleset.globalRules.deviceReplacementYears
