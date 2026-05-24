@@ -110,6 +110,7 @@ struct DashboardView: View {
     private var scanCTA: some View {
         Group {
             if activeStudent != nil {
+                let isFirstReceipt = myExpenses.isEmpty
                 Menu {
                     Button { capturingSource = .scanner; showCapture = true } label: {
                         Label("Scan with camera", systemImage: "doc.text.viewfinder")
@@ -120,7 +121,14 @@ struct DashboardView: View {
                 } label: {
                     HStack {
                         Image(systemName: "doc.text.viewfinder")
-                        Text("Scan receipt").bold()
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text(isFirstReceipt ? "Scan your first receipt" : "Scan receipt").bold()
+                            if isFirstReceipt {
+                                Text("Get a verdict in seconds")
+                                    .font(.caption2)
+                                    .opacity(0.9)
+                            }
+                        }
                         Spacer()
                         Image(systemName: "chevron.right")
                     }

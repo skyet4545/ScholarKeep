@@ -7,12 +7,13 @@ final class StudentManagementUITests: XCTestCase {
         app.launchArguments = ["--reset"]
         app.launch()
         app.buttons["Get started"].tap()
-        app.buttons["I understand — continue"].tap()
+        app.buttons["Next"].tap() // How it works
         let nameField = app.textFields["Student name"]
         _ = nameField.waitForExistence(timeout: 3)
         nameField.tap()
         nameField.typeText(name)
         app.buttons["Next"].tap()
+        app.buttons["I understand — continue"].tap()
         app.buttons["Finish"].tap()
         _ = app.staticTexts["Active student"].waitForExistence(timeout: 5)
         return app
