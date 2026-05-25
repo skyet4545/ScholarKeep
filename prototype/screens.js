@@ -30,15 +30,28 @@ function statusBar() {
 }
 
 function tabBar(active) {
-  const tabs = [
-    { key: 'home', label: 'Home', icon: icons.home },
-    { key: 'check', label: 'Check', icon: icons.bubble },
-    { key: 'claims', label: 'Claims', icon: icons.tray },
-    { key: 'more', label: 'More', icon: icons.gear }
-  ];
+  // 4 tabs + center FAB for Scan (Cash App / Day One pattern)
+  const navMap = { home: 'dashboard', check: 'chat', claims: 'claims', more: 'more' };
+  function tab(key, label, icon) {
+    return `<button class="tab ${key === active ? 'active' : ''}" data-nav="${navMap[key]}">${icon}<span>${label}</span></button>`;
+  }
   return `<div class="tabbar">
-    ${tabs.map(t => `<button class="tab ${t.key === active ? 'active' : ''}" data-nav="${t.key === 'home' ? 'dashboard' : t.key === 'check' ? 'chat' : t.key === 'claims' ? 'claims' : 'settings'}">${t.icon}<span>${t.label}</span></button>`).join('')}
+    ${tab('home', 'Home', icons.home)}
+    ${tab('check', 'Check', icons.bubble)}
+    <button class="fab" data-nav="scanReview" aria-label="Scan receipt">${icons.scan}</button>
+    ${tab('claims', 'Claims', icons.tray)}
+    ${tab('more', 'More', icons.gear)}
   </div>`;
+}
+
+function studentStrip() {
+  // Always-visible context: whose data am I looking at?
+  return `<button class="student-strip" data-nav="studentDetail">
+    <span class="ss-avatar">M</span>
+    <span class="ss-name">Maya</span>
+    <span class="ss-sub">FES-UA · 2026-27</span>
+    <span class="ss-chev">▾</span>
+  </button>`;
 }
 
 // ===== Screens =====
@@ -190,40 +203,77 @@ const Screens = {
     </div>
   `,
 
-  // 6. Dashboard / Home
+  // 6. Dashboard / Home — Apple Wallet feel: hero + 3 quick stats + activity
   dashboard: () => `
     ${statusBar()}
-    <div class="nav-bar"><span style="width:32px;"></span><div class="nav-title">Home</div><button class="nav-action" data-nav="studentDetail" aria-label="Student">${icons.person}</button></div>
-    <div class="large-title" data-nav="studentDetail" style="cursor:pointer;">Maya <span style="color:var(--text-tertiary);font-size:20px;font-weight:500;">›</span></div>
-    <div class="scroll" style="padding-top:4px;">
-      <div class="dash-hero">
-        <div class="eyebrow">Available now</div>
-        <div class="hero-number">$3,847.20</div>
-        <div class="footnote" style="margin-top:4px;">of $9,997.00 awarded · $1,250 pending</div>
-        <div class="progress"><span style="width:38%"></span></div>
-        <div class="pills">
-          <span class="pill">FES-UA</span>
-          <span class="pill neutral">Step Up</span>
-          <span class="pill neutral">2026-27</span>
+    ${studentStrip()}
+    <div class="scroll" style="padding-top:8px;">
+      <div class="wallet-hero" data-nav="studentDetail">
+        <div class="wh-row">
+          <span class="eyebrow" style="color:rgba(255,255,255,0.75);">Available now</span>
+          <span class="caption" style="color:rgba(255,255,255,0.65);">FES-UA</span>
+        </div>
+        <div class="wh-number">$3,847.20</div>
+        <div class="wh-row">
+          <span class="footnote" style="color:rgba(255,255,255,0.8);">of $9,997.00 award</span>
+          <span class="footnote" style="color:rgba(255,255,255,0.8);">38%</span>
+        </div>
+        <div class="wh-progress"><span style="width:38%"></span></div>
+      </div>
+
+      <div class="tile-grid">
+        <button class="tile" data-nav="claims">
+          <div class="t-num">11</div>
+          <div class="t-label">Claims</div>
+          <div class="t-sub" style="color:var(--status-warn);">1 on hold</div>
+        </button>
+        <button class="tile" data-nav="chat">
+          <div class="t-num">$1,250</div>
+          <div class="t-label">Pending</div>
+          <div class="t-sub muted">awaiting review</div>
+        </button>
+        <button class="tile" data-nav="claims">
+          <div class="t-num" style="color:var(--status-bad);">5d</div>
+          <div class="t-label">Pre-auth cutoff</div>
+          <div class="t-sub muted">May 29</div>
+        </button>
+      </div>
+
+      <div class="section-header"><div class="h-title">Recent activity</div><div class="h-action" data-nav="claims">See all</div></div>
+      <div class="card" style="padding:8px 16px;">
+        <div class="row" data-nav="claimDetail">
+          <div class="row-icon" style="background:var(--status-good-bg);color:var(--status-good);">${icons.check}</div>
+          <div class="row-content">
+            <div class="row-title">May submission package</div>
+            <div class="row-subtitle">Submitted May 15 · $847.20</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="row" data-nav="claimDetail">
+          <div class="row-icon" style="background:var(--status-warn-bg);color:var(--status-warn);">${icons.warning}</div>
+          <div class="row-content">
+            <div class="row-title">April therapy claim</div>
+            <div class="row-subtitle">On hold · needs BCBA credentials</div>
+          </div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="row" data-nav="scanReview">
+          <div class="row-icon">${icons.doc}</div>
+          <div class="row-content">
+            <div class="row-title">Office Depot · $84.97</div>
+            <div class="row-subtitle">Scanned May 23 · likely eligible</div>
+          </div>
+          <div class="chevron">›</div>
         </div>
       </div>
 
-      <div class="cta-card" data-nav="scanReview">
-        <div class="cta-icon">${icons.scan}</div>
-        <div class="cta-text">
-          <div class="cta-title">Scan a receipt</div>
-          <div class="cta-sub">One or many at a time</div>
-        </div>
-        <div style="opacity:0.8;">${icons.chevron}</div>
-      </div>
-
-      <div class="section-header"><div class="h-title">Key dates this year</div></div>
+      <div class="section-header"><div class="h-title">Key dates</div></div>
       <div class="card">
         <div class="deadline-row soon">
           <span class="d-dot"></span>
           <div class="d-content">
             <div class="d-title">Pre-auth cutoff</div>
-            <div class="d-sub">May 29 — last day to submit</div>
+            <div class="d-sub">May 29</div>
           </div>
           <div class="d-count">5d</div>
         </div>
@@ -231,7 +281,7 @@ const Screens = {
           <span class="d-dot"></span>
           <div class="d-content">
             <div class="d-title">Spend cliff</div>
-            <div class="d-sub">June 30 — purchases must occur by</div>
+            <div class="d-sub">June 30</div>
           </div>
           <div class="d-count">37d</div>
         </div>
@@ -239,25 +289,10 @@ const Screens = {
           <span class="d-dot"></span>
           <div class="d-content">
             <div class="d-title">Submission cliff</div>
-            <div class="d-sub">July 31 — reimbursement deadline</div>
+            <div class="d-sub">July 31</div>
           </div>
           <div class="d-count">68d</div>
         </div>
-      </div>
-
-      <div class="section-header"><div class="h-title">Claims at a glance</div><div class="h-action" data-nav="claims">See all</div></div>
-      <div class="card">
-        <div style="display:flex;gap:0;text-align:center;">
-          <div style="flex:1;"><div class="title-2">3</div><div class="caption">Draft</div></div>
-          <div style="flex:1;"><div class="title-2" style="color:var(--accent);">2</div><div class="caption">Submitted</div></div>
-          <div style="flex:1;"><div class="title-2" style="color:var(--status-warn);">1</div><div class="caption">On hold</div></div>
-          <div style="flex:1;"><div class="title-2" style="color:var(--status-good);">5</div><div class="caption">Paid</div></div>
-        </div>
-      </div>
-
-      <div class="card compact" style="margin-top:16px;background:var(--bg-subtle);">
-        <div class="eyebrow">Heads up</div>
-        <div class="footnote" style="margin-top:4px;">Personal tool — not affiliated with FLDOE, Step Up, AAA, or EMA. Confirm everything against the official Purchasing Guide.</div>
       </div>
     </div>
     ${tabBar('home')}
@@ -319,9 +354,9 @@ const Screens = {
   // 8. Can I buy this — chat
   chat: () => `
     ${statusBar()}
-    <div class="nav-bar"><span style="width:60px;"></span><div class="nav-title">Can I buy this?</div><button class="nav-action" style="font-size:15px;">Clear</button></div>
-    <div style="padding:6px 16px 8px;display:flex;gap:6px;">
-      <span class="pill">Maya · FES-UA</span>
+    ${studentStrip()}
+    <div class="nav-bar" style="padding-top:4px;"><span style="width:60px;"></span><div class="nav-title">Can I buy this?</div><button class="nav-action" style="font-size:15px;">Clear</button></div>
+    <div style="padding:2px 16px 8px;display:flex;gap:6px;">
       <span class="pill neutral">Reimburse ▼</span>
     </div>
     <div class="scroll" style="padding:8px 16px 100px;">
@@ -357,8 +392,8 @@ const Screens = {
   // 9. Claims list
   claims: () => `
     ${statusBar()}
-    <div class="nav-bar"><span style="width:32px;"></span><div class="nav-title">Claims</div><button class="nav-action">+</button></div>
-    <div class="large-title">Claims</div>
+    ${studentStrip()}
+    <div class="nav-bar" style="padding-top:4px;"><span style="width:32px;"></span><div class="nav-title">Claims</div><button class="nav-action">+</button></div>
     <div class="scroll" style="padding-top:4px;">
       <div style="display:flex;gap:6px;margin-bottom:16px;overflow-x:auto;padding-bottom:4px;">
         <span class="pill">All 11</span>
@@ -418,7 +453,7 @@ const Screens = {
   // 10. Settings
   settings: () => `
     ${statusBar()}
-    <div class="nav-bar"><span style="width:32px;"></span><div class="nav-title">Settings</div><span style="width:32px;"></span></div>
+    <div class="nav-bar"><button class="nav-action" data-nav="more">‹ More</button><div class="nav-title">Settings</div><span style="width:32px;"></span></div>
     <div class="large-title">Settings</div>
     <div class="scroll" style="padding-top:4px;">
       <div class="settings-header">Subscription</div>
@@ -486,6 +521,60 @@ const Screens = {
       <div class="settings-footer" style="margin-top:32px;text-align:center;padding-bottom:24px;">
         <button class="btn-text" data-nav="welcome" style="font-size:13px;">↺ Restart onboarding (prototype only)</button>
       </div>
+    </div>
+    ${tabBar('more')}
+  `,
+
+  // 10b. More — hub screen (not a junk drawer)
+  more: () => `
+    ${statusBar()}
+    ${studentStrip()}
+    <div class="nav-bar" style="padding-top:4px;"><span style="width:32px;"></span><div class="nav-title">More</div><span style="width:32px;"></span></div>
+    <div class="large-title">More</div>
+    <div class="scroll" style="padding-top:4px;">
+      <div class="more-grid">
+        <button class="more-tile" data-nav="studentDetail">
+          <div class="mt-icon" style="background:var(--accent-soft);color:var(--accent);">${icons.person}</div>
+          <div class="mt-title">Students</div>
+          <div class="mt-sub">2</div>
+        </button>
+        <button class="more-tile" data-nav="claims">
+          <div class="mt-icon" style="background:var(--accent-soft);color:var(--accent);">${icons.recurring}</div>
+          <div class="mt-title">Recurring tasks</div>
+          <div class="mt-sub">3 active</div>
+        </button>
+        <button class="more-tile" data-nav="paywall">
+          <div class="mt-icon" style="background:var(--accent-soft);color:var(--accent);">${icons.grad}</div>
+          <div class="mt-title">ScholarKeep Pro</div>
+          <div class="mt-sub" style="color:var(--status-good);">Active</div>
+        </button>
+        <button class="more-tile" data-nav="settings">
+          <div class="mt-icon" style="background:var(--accent-soft);color:var(--accent);">${icons.gear}</div>
+          <div class="mt-title">Settings</div>
+          <div class="mt-sub">Privacy, backup, exports</div>
+        </button>
+      </div>
+
+      <div class="section-header" style="margin-top:24px;"><div class="h-title">Reference</div></div>
+      <div class="card" style="padding:0;">
+        <div class="row" style="padding:14px 16px;">
+          <div class="row-icon">${icons.doc}</div>
+          <div class="row-content"><div class="row-title">Reference guide</div><div class="row-subtitle">FES-UA, FES-EO, PEP rules</div></div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="row" style="padding:14px 16px;">
+          <div class="row-icon">${icons.info}</div>
+          <div class="row-content"><div class="row-title">Disclaimer</div><div class="row-subtitle">Not affiliated with Step Up, AAA, or FLDOE</div></div>
+          <div class="chevron">›</div>
+        </div>
+        <div class="row" style="padding:14px 16px;">
+          <div class="row-icon">${icons.shield}</div>
+          <div class="row-content"><div class="row-title">Privacy policy</div><div class="row-subtitle">What we never collect</div></div>
+          <div class="chevron">›</div>
+        </div>
+      </div>
+
+      <div class="footnote" style="text-align:center;margin:24px 0 8px;color:var(--text-tertiary);">ScholarKeep v0.5.0 (build 7)</div>
     </div>
     ${tabBar('more')}
   `,
@@ -721,6 +810,7 @@ const screenOrder = [
   { key: 'chat', label: 'Can I buy this? (chat)', group: 'Main' },
   { key: 'claims', label: 'Claims list', group: 'Main' },
   { key: 'claimDetail', label: '↳ Claim detail', group: 'Main' },
-  { key: 'settings', label: 'Settings', group: 'Main' },
+  { key: 'more', label: 'More (hub)', group: 'Main' },
+  { key: 'settings', label: '↳ Settings', group: 'Main' },
   { key: 'paywall', label: '↳ Paywall / Manage Pro', group: 'Main' },
 ];
