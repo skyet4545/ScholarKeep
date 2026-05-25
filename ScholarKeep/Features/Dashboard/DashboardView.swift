@@ -11,9 +11,12 @@ struct DashboardView: View {
     @Query(sort: \Expense.purchaseDate, order: .reverse) private var expenses: [Expense]
     @Query(sort: \Claim.createdAt, order: .reverse) private var claims: [Claim]
     @Query(sort: \BalanceEntry.date) private var balanceEntries: [BalanceEntry]
+    @Query(sort: \RecurringTask.nextDueDate) private var recurringTasks: [RecurringTask]
+    @Environment(\.modelContext) private var modelContext
 
     @State private var showCapture = false
     @State private var capturingSource: CaptureFlowView.Source = .scanner
+    @State private var showGroupedClaimConfirm = false
 
     // MARK: Derived
 
@@ -25,6 +28,17 @@ struct DashboardView: View {
     private var myClaims: [Claim]     { activeStudent.map { s in claims.filter { $0.student?.id == s.id } } ?? [] }
     private var myEntries: [BalanceEntry] { activeStudent.map { s in balanceEntries.filter { $0.student?.id == s.id } } ?? [] }
     private var balanceSummary: BalanceLedger.Summary { BalanceLedger.summarize(entries: myEntries) }
+    private var unclaimedExpenses: [Expense] { myExpenses.filter { $0.claim == nil } }
+    private var unclaimedTotal: Decimal { unclaimedExpenses.reduce(Decimal(0)) { $0 + $1.total } }
+    private var myUpcomingTasks: [RecurringTask] {
+        guard let s = activeStudent else { return [] }
+        let cutoff = Calendar.current.date(byAdding: .day, value: 60, to: .now) ?? .now
+        return recurringTasks
+            .filter { $0.student?.id == s.id && !$0.isArchived && $0.nextDueDate <= cutoff }
+            .sorted { $0.nextDueDate < $1.nextDueDate }
+            .prefix(3)
+            .map { $0 }
+    }
 
     var body: some View {
         NavigationStack {
@@ -34,6 +48,8 @@ struct DashboardView: View {
                     if activeStudent != nil {
                         heroBalance
                         quickStatGrid
+                        unclaimedReceiptsCard
+                        upcomingRemindersCard
                         recentActivitySection
                         keyDatesSection
                     } else {
@@ -158,6 +174,114 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(DS.base)
         .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+    }
+
+    // MARK: Unclaimed receipts — one-tap auto-group into a claim
+
+    @ViewBuilder
+    private var unclaimedReceiptsCard: some View {
+        if unclaimedExpenses.count >= 2 {
+            VStack(alignment: .leading, spacing: DS.sm) {
+                sectionHeader(title: "Submission helper")
+                Button {
+                    showGroupedClaimConfirm = true
+                } label: {
+                    HStack(spacing: DS.base) {
+                        Image(systemName: "tray.and.arrow.up.fill")
+                            .font(.title3.weight(.semibold))
+                            .foregroundStyle(DS.accent)
+                            .frame(width: 44, height: 44)
+                            .background(DS.accentSoft, in: RoundedRectangle(cornerRadius: 12))
+                        VStack(alignment: .leading, spacing: 2) {
+                            Text("\(unclaimedExpenses.count) receipts ready to submit")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.primary)
+                            Text("\(unclaimedTotal.formatted(.currency(code: "USD"))) · tap to group into one claim")
+                                .font(.caption)
+                                .foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                        Image(systemName: "chevron.right")
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(.tertiary)
+                    }
+                    .padding(DS.base)
+                    .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                    .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                }
+                .buttonStyle(.plain)
+                .padding(.horizontal, DS.lg)
+                .confirmationDialog(
+                    "Group \(unclaimedExpenses.count) receipts into a new claim?",
+                    isPresented: $showGroupedClaimConfirm,
+                    titleVisibility: .visible
+                ) {
+                    Button("Create draft claim") { groupUnclaimedReceipts() }
+                    Button("Cancel", role: .cancel) { }
+                } message: {
+                    Text("Total \(unclaimedTotal.formatted(.currency(code: "USD"))). You can review and edit before submitting.")
+                }
+            }
+        }
+    }
+
+    private func groupUnclaimedReceipts() {
+        guard let student = activeStudent else { return }
+        let title = "Claim · \(Date.now.formatted(.dateTime.month(.abbreviated).day().year()))"
+        let claim = Claim(title: title,
+                          status: .draft,
+                          createdAt: .now,
+                          student: student,
+                          expenses: unclaimedExpenses)
+        modelContext.insert(claim)
+        for expense in unclaimedExpenses {
+            expense.claim = claim
+        }
+        try? modelContext.save()
+    }
+
+    // MARK: Upcoming reminders — what was the Recurring Tasks tab, now contextual
+
+    @ViewBuilder
+    private var upcomingRemindersCard: some View {
+        if !myUpcomingTasks.isEmpty {
+            VStack(alignment: .leading, spacing: DS.sm) {
+                sectionHeader(title: "Upcoming") {
+                    NavigationLink("All") { RecurringTaskListView() }
+                        .font(.footnote)
+                }
+                VStack(spacing: 0) {
+                    ForEach(myUpcomingTasks) { task in
+                        HStack(spacing: DS.md) {
+                            Image(systemName: "bell.badge.fill")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(DS.accent)
+                                .frame(width: 32, height: 32)
+                                .background(DS.accentSoft, in: RoundedRectangle(cornerRadius: 10))
+                            VStack(alignment: .leading, spacing: 1) {
+                                Text(task.title).font(.subheadline)
+                                Text(task.nextDueDate.formatted(date: .abbreviated, time: .omitted))
+                                    .font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            let days = Calendar.current.dateComponents([.day], from: .now, to: task.nextDueDate).day ?? 0
+                            Text("\(days)d")
+                                .font(.footnote.weight(.semibold))
+                                .monospacedDigit()
+                                .foregroundStyle(days < 7 ? DS.statusBad : days < 30 ? DS.statusWarn : .secondary)
+                        }
+                        .padding(.horizontal, DS.base)
+                        .padding(.vertical, DS.md)
+                        if task.id != myUpcomingTasks.last?.id {
+                            Divider().padding(.leading, 56)
+                        }
+                    }
+                }
+                .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                .padding(.horizontal, DS.lg)
+            }
+        }
     }
 
     // MARK: Recent activity — claims + receipts merged

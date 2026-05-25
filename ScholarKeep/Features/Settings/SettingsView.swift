@@ -220,6 +220,11 @@ struct SettingsView: View {
             LabeledContent("Students", value: "\(students.count)")
             LabeledContent("Expenses", value: "\(expenses.count)")
             LabeledContent("Claims", value: "\(claims.count)")
+            NavigationLink {
+                ReportsView()
+            } label: {
+                Label("Reports & summaries", systemImage: "chart.bar.doc.horizontal")
+            }
             Button {
                 exportAll()
             } label: {

@@ -87,6 +87,10 @@ struct MoreMenuView: View {
     }
 
     private var primaryGrid: some View {
+        // v0.5.2: trimmed to 2 high-frequency destinations only.
+        // Recurring/Reports/Pre-auth/Providers are auxiliary — surfaced contextually
+        // (recurring reminders on Home, pre-auth in the verdict, providers auto-detected
+        // from receipts) rather than as destinations.
         LazyVGrid(columns: [GridItem(.flexible(), spacing: DS.sm),
                             GridItem(.flexible(), spacing: DS.sm)],
                   spacing: DS.sm) {
@@ -95,18 +99,8 @@ struct MoreMenuView: View {
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("moreTileStudents")
-            NavigationLink { RecurringTaskListView() } label: {
-                moreTile(title: "Recurring", subtitle: "Reviews & reminders", symbol: "arrow.triangle.2.circlepath")
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("moreTileRecurring")
-            NavigationLink { ReportsView() } label: {
-                moreTile(title: "Reports", subtitle: "Export & summaries", symbol: "chart.bar.doc.horizontal")
-            }
-            .buttonStyle(.plain)
-            .accessibilityIdentifier("moreTileReports")
             NavigationLink { SettingsView() } label: {
-                moreTile(title: "Settings", subtitle: "Privacy, backup, Pro", symbol: "gearshape.fill")
+                moreTile(title: "Settings", subtitle: "Privacy, backup, Pro, exports", symbol: "gearshape.fill")
             }
             .buttonStyle(.plain)
             .accessibilityIdentifier("moreTileSettings")
@@ -115,6 +109,8 @@ struct MoreMenuView: View {
     }
 
     private var secondarySection: some View {
+        // v0.5.2: Records collapsed to the two things a homeschool mom actually
+        // uses regularly. Providers and Pre-auth removed (auto-detected, not managed).
         VStack(alignment: .leading, spacing: DS.sm) {
             sectionHeader("Records")
             VStack(spacing: 0) {
@@ -125,16 +121,6 @@ struct MoreMenuView: View {
                 Divider().padding(.leading, 56)
                 NavigationLink { BalanceLedgerView() } label: {
                     moreRow(title: "Balance ledger", symbol: "dollarsign.circle.fill")
-                }
-                .buttonStyle(.plain)
-                Divider().padding(.leading, 56)
-                NavigationLink { ProviderListView() } label: {
-                    moreRow(title: "Providers", symbol: "person.text.rectangle.fill")
-                }
-                .buttonStyle(.plain)
-                Divider().padding(.leading, 56)
-                NavigationLink { PreAuthListView() } label: {
-                    moreRow(title: "Pre-authorizations", symbol: "checkmark.shield.fill")
                 }
                 .buttonStyle(.plain)
             }
