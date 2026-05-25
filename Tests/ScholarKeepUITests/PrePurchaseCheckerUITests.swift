@@ -15,7 +15,7 @@ final class PrePurchaseCheckerUITests: XCTestCase {
         app.buttons["Next"].tap()
         app.buttons["I understand — continue"].tap()
         app.buttons["Finish"].tap()
-        _ = app.staticTexts["Active student"].waitForExistence(timeout: 5)
+        _ = app.navigationBars["Home"].waitForExistence(timeout: 5)
         return app
     }
 

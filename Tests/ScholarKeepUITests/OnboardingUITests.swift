@@ -32,8 +32,9 @@ final class OnboardingUITests: XCTestCase {
         app.buttons["Finish"].tap()
 
         // Should land on Home tab
-        XCTAssertTrue(app.staticTexts["Active student"].waitForExistence(timeout: 5))
-        XCTAssertTrue(app.staticTexts["Test Student"].exists)
+        // v0.5.0: dashboard nav title is "Home", student name shows in the strip
+        XCTAssertTrue(app.navigationBars["Home"].waitForExistence(timeout: 5))
+        XCTAssertTrue(app.staticTexts["Test Student"].waitForExistence(timeout: 3))
     }
 
     func testHowItWorksBackButton() throws {

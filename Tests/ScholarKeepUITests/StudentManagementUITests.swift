@@ -15,15 +15,16 @@ final class StudentManagementUITests: XCTestCase {
         app.buttons["Next"].tap()
         app.buttons["I understand — continue"].tap()
         app.buttons["Finish"].tap()
-        _ = app.staticTexts["Active student"].waitForExistence(timeout: 5)
+        _ = app.navigationBars["Home"].waitForExistence(timeout: 5)
         return app
     }
 
     func testCanAddSecondStudent() throws {
         let app = launchAndOnboard()
         app.tabBars.buttons["More"].tap()
-        XCTAssertTrue(app.cells.staticTexts["Students"].waitForExistence(timeout: 3))
-        app.cells.staticTexts["Students"].tap()
+        let studentsTile = app.buttons["moreTileStudents"]
+        XCTAssertTrue(studentsTile.waitForExistence(timeout: 3))
+        studentsTile.tap()
 
         XCTAssertTrue(app.navigationBars["Students"].waitForExistence(timeout: 3))
         XCTAssertTrue(app.staticTexts["First Kid"].exists)

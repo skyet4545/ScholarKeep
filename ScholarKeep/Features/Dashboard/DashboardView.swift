@@ -1,6 +1,10 @@
 import SwiftUI
 import SwiftData
 
+/// v0.5.0 dashboard — Jony Ive remix:
+/// clean white hero with one giant ink number, three muted quick stats,
+/// recent activity feed, and key dates. Scan lives as a top-right nav action,
+/// Apple Reminders-style — no FAB.
 struct DashboardView: View {
     @Environment(AppSettings.self) private var settings
     @Query(sort: \Student.createdAt) private var students: [Student]
@@ -11,58 +15,36 @@ struct DashboardView: View {
     @State private var showCapture = false
     @State private var capturingSource: CaptureFlowView.Source = .scanner
 
+    // MARK: Derived
+
     private var activeStudent: Student? {
-        guard let id = settings.activeStudentID else { return students.first }
-        return students.first { $0.id == id }
+        if let id = settings.activeStudentID { return students.first { $0.id == id } }
+        return students.first
     }
-
-    private var myExpenses: [Expense] {
-        guard let s = activeStudent else { return [] }
-        return expenses.filter { $0.student?.id == s.id }
-    }
-
-    private var myClaims: [Claim] {
-        guard let s = activeStudent else { return [] }
-        return claims.filter { $0.student?.id == s.id }
-    }
+    private var myExpenses: [Expense] { activeStudent.map { s in expenses.filter { $0.student?.id == s.id } } ?? [] }
+    private var myClaims: [Claim]     { activeStudent.map { s in claims.filter { $0.student?.id == s.id } } ?? [] }
+    private var myEntries: [BalanceEntry] { activeStudent.map { s in balanceEntries.filter { $0.student?.id == s.id } } ?? [] }
+    private var balanceSummary: BalanceLedger.Summary { BalanceLedger.summarize(entries: myEntries) }
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    activeStudentCard
-                    scanCTA
-                    balanceCard
-                    needsAttentionCard
-                    deadlineCard
-                    claimsSummaryCard
-                    disclaimerCard
-                }
-                .padding(20)
-            }
-            .navigationTitle("Home")
-            .toolbar {
-                if !students.isEmpty {
-                    ToolbarItem(placement: .topBarTrailing) {
-                        Menu {
-                            ForEach(students) { s in
-                                Button {
-                                    settings.activeStudentID = s.id
-                                } label: {
-                                    HStack {
-                                        Text(s.displayName)
-                                        if settings.activeStudentID == s.id {
-                                            Image(systemName: "checkmark")
-                                        }
-                                    }
-                                }
-                            }
-                        } label: {
-                            Label("Switch", systemImage: "person.2.crop.square.stack")
-                        }
+                VStack(alignment: .leading, spacing: DS.lg) {
+                    StudentStripView()
+                    if activeStudent != nil {
+                        heroBalance
+                        quickStatGrid
+                        recentActivitySection
+                        keyDatesSection
+                    } else {
+                        emptyState
                     }
                 }
+                .padding(.bottom, DS.xxl)
             }
+            .background(DS.canvas.ignoresSafeArea())
+            .navigationTitle("Home")
+            .toolbar { scanToolbar }
             .sheet(isPresented: $showCapture) {
                 if let student = activeStudent {
                     CaptureFlowView(student: student, source: capturingSource)
@@ -71,244 +53,337 @@ struct DashboardView: View {
         }
     }
 
-    private var activeStudentCard: some View {
-        Group {
-            if let s = activeStudent {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Active student").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                    Text(s.displayName).font(.title.bold())
-                    HStack(spacing: 6) {
-                        Pill(text: s.program.shortName)
-                        Pill(text: s.sfo.portalName)
-                        Pill(text: s.schoolYear)
-                    }
-                    if let award = s.awardAmount {
-                        let total = myExpenses.reduce(Decimal(0)) { $0 + $1.total }
-                        let nsAward = NSDecimalNumber(decimal: award).doubleValue
-                        let nsTotal = NSDecimalNumber(decimal: total).doubleValue
-                        ProgressView(value: min(nsTotal, nsAward), total: max(nsAward, 1))
-                        Text("\(total.formatted(.currency(code: "USD"))) of \(award.formatted(.currency(code: "USD"))) tracked")
-                            .font(.caption).foregroundStyle(.secondary)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-                .background(Color.accentColor.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
-            } else {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("No active student").font(.headline)
-                    Text("Add a student from the Students tab to begin.")
-                        .font(.subheadline).foregroundStyle(.secondary)
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-                .background(Color.secondary.opacity(0.1), in: RoundedRectangle(cornerRadius: 16))
-            }
-        }
-    }
+    // MARK: Toolbar — Apple Reminders-style "+" pattern, no FAB
 
-    private var scanCTA: some View {
-        Group {
-            if activeStudent != nil {
-                let isFirstReceipt = myExpenses.isEmpty
+    @ToolbarContentBuilder
+    private var scanToolbar: some ToolbarContent {
+        if activeStudent != nil {
+            ToolbarItem(placement: .topBarTrailing) {
                 Menu {
-                    Button { capturingSource = .scanner; showCapture = true } label: {
+                    Button {
+                        capturingSource = .scanner; showCapture = true
+                    } label: {
                         Label("Scan with camera", systemImage: "doc.text.viewfinder")
                     }
-                    Button { capturingSource = .photoLibrary; showCapture = true } label: {
+                    Button {
+                        capturingSource = .photoLibrary; showCapture = true
+                    } label: {
                         Label("Pick from library", systemImage: "photo.on.rectangle")
                     }
                 } label: {
-                    HStack {
-                        Image(systemName: "doc.text.viewfinder")
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text(isFirstReceipt ? "Scan your first receipt" : "Scan receipt").bold()
-                            if isFirstReceipt {
-                                Text("Get a verdict in seconds")
-                                    .font(.caption2)
-                                    .opacity(0.9)
-                            }
-                        }
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                    }
-                    .padding()
-                    .frame(maxWidth: .infinity)
-                    .background(Color.accentColor, in: RoundedRectangle(cornerRadius: 14))
-                    .foregroundStyle(.white)
+                    Image(systemName: "plus")
+                        .font(.title3.weight(.semibold))
                 }
             }
         }
     }
 
-    private var balanceCard: some View {
-        let myEntries = balanceEntries.filter { $0.student?.id == activeStudent?.id }
-        let summary = BalanceLedger.summarize(entries: myEntries)
-        return Group {
-            if !myEntries.isEmpty {
-                NavigationLink {
-                    BalanceLedgerView()
-                } label: {
-                    VStack(alignment: .leading, spacing: 6) {
-                        HStack {
-                            Text("Available now").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-                            Spacer()
-                            Image(systemName: "chevron.right").font(.caption2).foregroundStyle(.secondary)
-                        }
-                        Text(summary.availableBalance.formatted(.currency(code: "USD")))
-                            .font(.title.bold().monospacedDigit())
-                            .foregroundStyle(summary.availableBalance < 0 ? .red : .primary)
-                        if summary.pendingClaims > 0 {
-                            Text("\(summary.pendingClaims.formatted(.currency(code: "USD"))) in pending claims")
-                                .font(.caption)
-                                .foregroundStyle(.orange)
-                        }
-                    }
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(16)
-                    .background(Color.accentColor.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
-                }
-                .buttonStyle(.plain)
-            }
-        }
-    }
+    // MARK: Hero — single ink number, clean white card, hairline progress
 
-    private var needsAttentionCard: some View {
-        let onHold = myClaims.filter { $0.status == .onHold }
-        let incomplete = myExpenses.filter { e in !e.readinessChecklist.isComplete && e.claim != nil && (e.claim?.status == .draft || e.claim?.status == .readyToSubmit) }
-        return Group {
-            if !onHold.isEmpty || !incomplete.isEmpty {
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("Needs attention").font(.headline)
-                    ForEach(onHold) { claim in
-                        Label("\(claim.title) is on hold", systemImage: "exclamationmark.circle")
-                            .font(.subheadline)
-                    }
-                    if !incomplete.isEmpty {
-                        Label("\(incomplete.count) expense(s) with incomplete checklist", systemImage: "checklist")
-                            .font(.subheadline)
-                    }
-                }
-                .frame(maxWidth: .infinity, alignment: .leading)
-                .padding(16)
-                .background(Color.orange.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
-            }
-        }
-    }
-
-    private var deadlineCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("Key dates this year").font(.caption.weight(.semibold)).foregroundStyle(.secondary)
-            ForEach(deadlines(), id: \.label) { item in
+    private var heroBalance: some View {
+        let available = balanceSummary.availableBalance
+        let award = activeStudent?.awardAmount ?? balanceSummary.totalDisbursed
+        let progress: Double = {
+            guard award > 0 else { return 0 }
+            let n = NSDecimalNumber(decimal: available).doubleValue
+            let d = NSDecimalNumber(decimal: award).doubleValue
+            return max(0, min(1, 1 - (n / d)))
+        }()
+        return VStack(alignment: .leading, spacing: DS.sm) {
+            Text("Available")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+            Text(available.formatted(.currency(code: "USD")))
+                .font(.system(size: 44, weight: .bold, design: .default))
+                .monospacedDigit()
+                .foregroundStyle(.primary)
+                .padding(.top, 2)
+            if award > 0 {
+                ProgressView(value: progress)
+                    .tint(DS.accent)
+                    .padding(.top, 6)
                 HStack {
-                    Image(systemName: item.icon)
-                        .foregroundStyle(item.tint)
-                    VStack(alignment: .leading, spacing: 0) {
-                        Text(item.label).font(.subheadline)
-                        Text(item.subline)
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-                    }
+                    Text("of \(award.formatted(.currency(code: "USD"))) award")
+                        .font(.footnote).foregroundStyle(.secondary)
                     Spacer()
-                    Text("\(item.daysAway)d")
-                        .font(.caption.bold().monospacedDigit())
-                        .foregroundStyle(item.tint)
+                    if balanceSummary.pendingClaims > 0 {
+                        Text("\(balanceSummary.pendingClaims.formatted(.currency(code: "USD"))) pending")
+                            .font(.footnote).foregroundStyle(DS.statusWarn)
+                    }
                 }
             }
+        }
+        .dsCard(padding: DS.xl)
+        .padding(.horizontal, DS.base)
+    }
+
+    // MARK: Three quick stats — muted, no color blocks
+
+    private var quickStatGrid: some View {
+        let draftCount = myClaims.filter { $0.status == .draft }.count
+        let onHoldCount = myClaims.filter { $0.status == .onHold }.count
+        let nextDeadline = nextDeadlineDays()
+        return HStack(spacing: DS.sm) {
+            quickStat(title: "Claims",
+                      number: "\(myClaims.count)",
+                      sub: onHoldCount > 0 ? "\(onHoldCount) on hold" : (draftCount > 0 ? "\(draftCount) draft" : "all clear"),
+                      subTint: onHoldCount > 0 ? DS.statusWarn : .secondary)
+            quickStat(title: "Receipts",
+                      number: "\(myExpenses.count)",
+                      sub: "tracked",
+                      subTint: .secondary)
+            quickStat(title: "Next cliff",
+                      number: nextDeadline.map { "\($0)d" } ?? "—",
+                      sub: nextDeadline.map { $0 < 30 ? "approaching" : "in the clear" } ?? "—",
+                      subTint: (nextDeadline ?? 99) < 7 ? DS.statusBad : (nextDeadline ?? 99) < 30 ? DS.statusWarn : .secondary)
+        }
+        .padding(.horizontal, DS.base)
+    }
+
+    private func quickStat(title: String, number: String, sub: String, subTint: Color) -> some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text(number)
+                .font(.title2.weight(.bold))
+                .monospacedDigit()
+                .foregroundStyle(.primary)
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.primary)
+                .padding(.top, 4)
+            Text(sub)
+                .font(.caption)
+                .foregroundStyle(subTint)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
+        .padding(DS.base)
+        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
     }
 
-    private struct DeadlineItem {
-        let label: String
-        let subline: String
-        let icon: String
-        let tint: Color
-        let daysAway: Int
+    // MARK: Recent activity — claims + receipts merged
+
+    private var recentActivitySection: some View {
+        let combined: [ActivityItem] =
+            (myClaims.prefix(3).map { ActivityItem(claim: $0) } +
+             myExpenses.prefix(3).map { ActivityItem(expense: $0) })
+            .sorted(by: { $0.date > $1.date })
+            .prefix(5)
+            .map { $0 }
+
+        return VStack(alignment: .leading, spacing: DS.sm) {
+            sectionHeader(title: "Recent activity") {
+                NavigationLink("See all") { ClaimsBoardView() }
+                    .font(.footnote)
+            }
+            if combined.isEmpty {
+                VStack(spacing: DS.sm) {
+                    Image(systemName: "tray")
+                        .font(.title2)
+                        .foregroundStyle(.tertiary)
+                    Text("Nothing yet")
+                        .font(.subheadline.weight(.semibold))
+                    Text("Tap + to scan your first receipt.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+                .frame(maxWidth: .infinity)
+                .padding(.vertical, DS.xl)
+                .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                .padding(.horizontal, DS.base)
+            } else {
+                VStack(spacing: 0) {
+                    ForEach(combined) { item in
+                        activityRow(item)
+                        if item.id != combined.last?.id {
+                            Divider().padding(.leading, 56)
+                        }
+                    }
+                }
+                .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                .padding(.horizontal, DS.base)
+            }
+        }
     }
+
+    private func activityRow(_ item: ActivityItem) -> some View {
+        HStack(spacing: DS.md) {
+            Image(systemName: item.symbol)
+                .font(.subheadline.weight(.semibold))
+                .foregroundStyle(item.tint)
+                .frame(width: 32, height: 32)
+                .background(item.tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 10))
+            VStack(alignment: .leading, spacing: 1) {
+                Text(item.title).font(.subheadline)
+                Text(item.subtitle).font(.caption).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Image(systemName: "chevron.right")
+                .font(.caption.weight(.semibold))
+                .foregroundStyle(.tertiary)
+        }
+        .padding(.horizontal, DS.base)
+        .padding(.vertical, DS.md)
+    }
+
+    // MARK: Key dates
+
+    private var keyDatesSection: some View {
+        let items = deadlines()
+        guard !items.isEmpty else { return AnyView(EmptyView()) }
+        return AnyView(
+            VStack(alignment: .leading, spacing: DS.sm) {
+                sectionHeader(title: "Key dates", trailing: { EmptyView() })
+                VStack(spacing: 0) {
+                    ForEach(items, id: \.label) { item in
+                        HStack(spacing: DS.md) {
+                            Circle()
+                                .fill(item.tint)
+                                .frame(width: 8, height: 8)
+                            VStack(alignment: .leading, spacing: 0) {
+                                Text(item.label).font(.subheadline)
+                                Text(item.subline).font(.caption).foregroundStyle(.secondary)
+                            }
+                            Spacer()
+                            Text("\(item.daysAway)d")
+                                .font(.footnote.weight(.semibold))
+                                .monospacedDigit()
+                                .foregroundStyle(item.tint)
+                        }
+                        .padding(.horizontal, DS.base)
+                        .padding(.vertical, DS.md)
+                        if item.label != items.last?.label {
+                            Divider().padding(.leading, DS.base + 8 + DS.md)
+                        }
+                    }
+                }
+                .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                .padding(.horizontal, DS.base)
+            }
+        )
+    }
+
+    private var emptyState: some View {
+        VStack(spacing: DS.md) {
+            Image(systemName: "person.crop.circle.badge.plus")
+                .font(.system(size: 44))
+                .foregroundStyle(.tertiary)
+            Text("Add a student to begin")
+                .font(.headline)
+            Text("Open Students from the More tab to add your first child.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+                .multilineTextAlignment(.center)
+                .padding(.horizontal, DS.xl)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, DS.xxxl)
+    }
+
+    private func sectionHeader<Trailing: View>(title: String, @ViewBuilder trailing: () -> Trailing = { EmptyView() }) -> some View {
+        HStack {
+            Text(title)
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .textCase(.uppercase)
+            Spacer()
+            trailing()
+        }
+        .padding(.horizontal, DS.base + DS.xs)
+        .padding(.top, DS.md)
+    }
+
+    // MARK: Deadline math
+
+    private struct DeadlineItem { let label: String; let subline: String; let tint: Color; let daysAway: Int }
 
     private func deadlines() -> [DeadlineItem] {
         let label = RulesetLoader.shared.schoolYearLabel
         let parts = label.split(separator: "-")
         guard parts.count == 2, let start = Int(parts[0]) else { return [] }
         let endYear = start + 1
-        func make(_ m: Int, _ d: Int, _ label: String, _ subline: String, _ icon: String) -> DeadlineItem? {
+        func make(_ m: Int, _ d: Int, _ label: String, _ subline: String) -> DeadlineItem? {
             var c = DateComponents(); c.year = endYear; c.month = m; c.day = d
             guard let date = Calendar.current.date(from: c), date >= .now else { return nil }
             let days = Calendar.current.dateComponents([.day], from: .now, to: date).day ?? 0
             let tint: Color
             switch days {
-            case ..<7:  tint = .red
-            case ..<30: tint = .orange
-            default:    tint = .primary
+            case ..<7:  tint = DS.statusBad
+            case ..<30: tint = DS.statusWarn
+            default:    tint = .secondary
             }
-            return DeadlineItem(label: label, subline: subline, icon: icon, tint: tint, daysAway: days)
+            return DeadlineItem(label: label, subline: subline, tint: tint, daysAway: days)
         }
         return [
-            make(5, 29, "Pre-auth cutoff", "May 29 — last day to submit pre-auth requests", "checkmark.shield"),
-            make(6, 30, "Spend cliff", "June 30 — purchases must occur by this date", "calendar.badge.exclamationmark"),
-            make(7, 31, "Submission cliff", "July 31 — reimbursement deadline, no extensions", "tray.and.arrow.up.fill")
+            make(5, 29, "Pre-auth cutoff", "May 29 — last day to submit"),
+            make(6, 30, "Spend cliff", "June 30 — purchase by"),
+            make(7, 31, "Submission cliff", "July 31 — reimbursement deadline")
         ].compactMap { $0 }
     }
 
-    private var claimsSummaryCard: some View {
-        let grouped = Dictionary(grouping: myClaims, by: { $0.status })
-        return VStack(alignment: .leading, spacing: 8) {
-            Text("Claims at a glance").font(.headline)
-            HStack(spacing: 12) {
-                summaryStat("Draft", grouped[.draft]?.count ?? 0)
-                summaryStat("Submitted", grouped[.submitted]?.count ?? 0)
-                summaryStat("On hold", grouped[.onHold]?.count ?? 0)
-                summaryStat("Paid", grouped[.paidReimbursed]?.count ?? 0)
-            }
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 16))
-    }
-
-    private func summaryStat(_ label: String, _ count: Int) -> some View {
-        VStack {
-            Text("\(count)").font(.title2.bold())
-            Text(label).font(.caption2).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity)
-    }
-
-    private var disclaimerCard: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            Label("Heads up", systemImage: "info.circle")
-                .font(.caption.weight(.semibold))
-                .foregroundStyle(.secondary)
-            Text(DisclaimerCopy.short).font(.caption).foregroundStyle(.secondary)
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(Color.secondary.opacity(0.06), in: RoundedRectangle(cornerRadius: 12))
-    }
-
-    private func nextSubmissionDeadline() -> Date? {
-        let label = RulesetLoader.shared.schoolYearLabel
-        let parts = label.split(separator: "-")
-        guard parts.count == 2, let start = Int(parts[0]) else { return nil }
-        var comps = DateComponents()
-        comps.year = start + 1
-        comps.month = 7
-        comps.day = 31
-        return Calendar.current.date(from: comps)
+    private func nextDeadlineDays() -> Int? {
+        deadlines().first?.daysAway
     }
 }
 
-private struct Pill: View {
-    let text: String
-    var body: some View {
-        Text(text)
-            .font(.caption.weight(.semibold))
-            .padding(.horizontal, 8)
-            .padding(.vertical, 3)
-            .background(Color.accentColor.opacity(0.18), in: Capsule())
-            .foregroundStyle(Color.accentColor)
+// MARK: - Merged activity item
+
+private struct ActivityItem: Identifiable {
+    let id: UUID
+    let date: Date
+    let title: String
+    let subtitle: String
+    let symbol: String
+    let tint: Color
+
+    init(claim: Claim) {
+        self.id = claim.id
+        self.date = claim.paidDate ?? claim.submittedDate ?? claim.createdAt
+        self.title = claim.title.isEmpty ? "Claim" : claim.title
+        let total = claim.expenses.reduce(Decimal(0)) { $0 + $1.total }
+        let amount = total.formatted(.currency(code: "USD"))
+        switch claim.status {
+        case .draft:
+            self.subtitle = "Draft · \(amount)"
+            self.symbol = "tray"
+            self.tint = .secondary
+        case .readyToSubmit:
+            self.subtitle = "Ready to submit · \(amount)"
+            self.symbol = "tray.full"
+            self.tint = .blue
+        case .submitted:
+            self.subtitle = "Submitted · \(amount)"
+            self.symbol = "paperplane.fill"
+            self.tint = DS.accent
+        case .onHold:
+            self.subtitle = "On hold · \(amount)"
+            self.symbol = "exclamationmark.triangle.fill"
+            self.tint = DS.statusWarn
+        case .approved:
+            self.subtitle = "Approved · \(amount)"
+            self.symbol = "checkmark.circle.fill"
+            self.tint = DS.statusGood
+        case .paidReimbursed:
+            self.subtitle = "Paid · \(amount)"
+            self.symbol = "checkmark.seal.fill"
+            self.tint = DS.statusGood
+        case .pendingReview:
+            self.subtitle = "Pending review · \(amount)"
+            self.symbol = "hourglass"
+            self.tint = DS.accent
+        case .denied:
+            self.subtitle = "Denied · \(amount)"
+            self.symbol = "xmark.circle.fill"
+            self.tint = DS.statusBad
+        }
+    }
+
+    init(expense: Expense) {
+        self.id = expense.id
+        self.date = expense.purchaseDate
+        self.title = expense.vendorName.isEmpty ? "Receipt" : expense.vendorName
+        let cat = expense.categoryKey ?? "Receipt"
+        self.subtitle = "\(cat.capitalized) · \(expense.total.formatted(.currency(code: "USD")))"
+        self.symbol = "doc.text"
+        self.tint = DS.accent
     }
 }
