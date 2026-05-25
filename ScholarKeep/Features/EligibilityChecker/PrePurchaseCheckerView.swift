@@ -15,42 +15,45 @@ struct PrePurchaseCheckerView: View {
 
     var body: some View {
         NavigationStack {
-            VStack(spacing: 0) {
-                contextStrip
-                if messages.isEmpty {
-                    emptyState
-                } else {
-                    ScrollViewReader { proxy in
-                        ScrollView {
-                            LazyVStack(alignment: .leading, spacing: 12) {
-                                ForEach(messages) { message in
-                                    ChatBubble(message: message)
-                                        .id(message.id)
+            ZStack {
+                DS.canvas.ignoresSafeArea()
+                VStack(spacing: 0) {
+                    contextStrip
+                    if messages.isEmpty {
+                        emptyState
+                    } else {
+                        ScrollViewReader { proxy in
+                            ScrollView {
+                                LazyVStack(alignment: .leading, spacing: 12) {
+                                    ForEach(messages) { message in
+                                        ChatBubble(message: message)
+                                            .id(message.id)
+                                    }
                                 }
+                                .padding(16)
                             }
-                            .padding(16)
-                        }
-                        .onChange(of: messages.count) { _, _ in
-                            if let last = messages.last {
-                                withAnimation(.easeOut) {
-                                    proxy.scrollTo(last.id, anchor: .bottom)
+                            .onChange(of: messages.count) { _, _ in
+                                if let last = messages.last {
+                                    withAnimation(.easeOut) {
+                                        proxy.scrollTo(last.id, anchor: .bottom)
+                                    }
                                 }
                             }
                         }
                     }
+                    inputBar
                 }
-                inputBar
             }
             .navigationTitle("Can I buy this?")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 if !messages.isEmpty {
                     ToolbarItem(placement: .topBarTrailing) {
-                        Button {
+                        Button("Clear") {
                             messages.removeAll()
-                        } label: {
-                            Image(systemName: "trash")
                         }
+                        .font(.body.weight(.semibold))
+                        .foregroundStyle(DS.accent)
                     }
                 }
             }

@@ -70,6 +70,8 @@ struct ReferenceGuideView: View {
                 }
             }
             .searchable(text: $searchText, prompt: "Search categories")
+            .scrollContentBackground(.hidden)
+            .background(DS.canvas)
             .navigationTitle("Reference")
         }
     }

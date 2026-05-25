@@ -1,6 +1,8 @@
 import SwiftUI
 import SwiftData
 
+/// v0.5.1 — Onboarding rewritten in Apple Journal style.
+/// Cream canvas, editorial headers, custom cards, no stock iOS Forms.
 struct OnboardingFlow: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppSettings.self) private var settings
@@ -19,187 +21,273 @@ struct OnboardingFlow: View {
 
     var body: some View {
         NavigationStack {
-            Group {
-                switch step {
-                case .welcome:     welcomeScreen
-                case .howItWorks:  howItWorksScreen
-                case .addStudent:  addStudentScreen
-                case .disclaimer:  disclaimerScreen
-                case .preferences: preferencesScreen
+            ZStack {
+                DS.canvas.ignoresSafeArea()
+                Group {
+                    switch step {
+                    case .welcome:     welcomeScreen
+                    case .howItWorks:  howItWorksScreen
+                    case .addStudent:  addStudentScreen
+                    case .disclaimer:  disclaimerScreen
+                    case .preferences: preferencesScreen
+                    }
                 }
+                .animation(.easeInOut(duration: 0.25), value: step)
             }
-            .animation(.default, value: step)
         }
     }
 
-    // MARK: 1. Welcome — value prop + trust signal
+    // MARK: 1. Welcome
 
     private var welcomeScreen: some View {
-        VStack(spacing: 24) {
+        VStack(spacing: 0) {
             Spacer()
-            Image(systemName: "graduationcap.fill")
-                .font(.system(size: 64))
-                .foregroundStyle(.tint)
-            VStack(spacing: 10) {
-                Text("Welcome to ScholarKeep")
-                    .font(.largeTitle.bold())
-                    .multilineTextAlignment(.center)
-                Text("A private companion for Florida ESA scholarship parents — built so you never lose a receipt or miss a deadline.")
+            VStack(spacing: DS.lg) {
+                ZStack {
+                    Circle()
+                        .fill(DS.accentSoft)
+                        .frame(width: 124, height: 124)
+                    Image(systemName: "graduationcap.fill")
+                        .font(.system(size: 56, weight: .regular))
+                        .foregroundStyle(DS.accent)
+                }
+                VStack(spacing: DS.sm) {
+                    Text("Welcome to")
+                        .font(.title3)
+                        .foregroundStyle(.secondary)
+                    Text("ScholarKeep")
+                        .font(.system(size: 38, weight: .bold))
+                        .tracking(-0.5)
+                }
+                Text("A private companion for Florida ESA scholarship parents — so you never lose a receipt or miss a deadline.")
                     .font(.body)
                     .foregroundStyle(.secondary)
                     .multilineTextAlignment(.center)
-                    .padding(.horizontal, 24)
+                    .padding(.horizontal, DS.xl)
+                    .padding(.top, DS.sm)
             }
+            Spacer()
             HStack(spacing: 6) {
                 Image(systemName: "lock.shield.fill")
-                    .foregroundStyle(.green)
+                    .font(.footnote)
+                    .foregroundStyle(DS.statusGood)
                 Text("Everything stays on your phone")
                     .font(.footnote.weight(.semibold))
                     .foregroundStyle(.secondary)
             }
-            .padding(.top, 4)
-            Spacer()
-            Button {
-                step = .howItWorks
-            } label: {
-                Text("Get started")
-                    .frame(maxWidth: .infinity)
-            }
-            .buttonStyle(.borderedProminent)
-            .controlSize(.large)
-            .padding(.horizontal, 24)
-            .padding(.bottom, 32)
+            .padding(.bottom, DS.md)
+            JournalCTA("Get started") { step = .howItWorks }
+                .padding(.horizontal, DS.lg)
+                .padding(.bottom, DS.xxxl)
         }
     }
 
-    // MARK: 2. How it works — three benefit cards
+    // MARK: 2. How it works
 
     private var howItWorksScreen: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("How ScholarKeep works")
-                        .font(.title2.bold())
-                        .padding(.bottom, 4)
-                    benefitCard(
-                        icon: "doc.text.viewfinder",
-                        title: "Scan receipts in seconds",
-                        body: "Snap one or multiple receipts at a time — Apple Vision reads the merchant, amount, and date right on your device."
-                    )
-                    benefitCard(
-                        icon: "checkmark.seal.fill",
-                        title: "Get a verdict instantly",
-                        body: "Tell ScholarKeep what you're buying and it'll cite the exact line of the official Purchasing Guide that says yes, no, or 'needs pre-auth'."
-                    )
-                    benefitCard(
-                        icon: "tray.and.arrow.up.fill",
-                        title: "Stay submission-ready",
-                        body: "Track every claim from draft to paid. Generate a clean PDF package right before the July 31 deadline."
-                    )
+                VStack(alignment: .leading, spacing: DS.lg) {
+                    JournalHeader(eyebrow: "STEP 2 OF 5",
+                                  title: "How it works")
+                    VStack(spacing: DS.md) {
+                        benefitCard(
+                            icon: "doc.text.viewfinder",
+                            title: "Scan receipts in seconds",
+                            body: "Snap one or many at a time — Apple Vision reads the merchant, amount, and date right on your device."
+                        )
+                        benefitCard(
+                            icon: "checkmark.seal.fill",
+                            title: "Get a verdict instantly",
+                            body: "Tell ScholarKeep what you're buying and it cites the exact Purchasing Guide line that says yes, no, or 'needs pre-auth.'"
+                        )
+                        benefitCard(
+                            icon: "tray.and.arrow.up.fill",
+                            title: "Stay submission-ready",
+                            body: "Track every claim from draft to paid. Generate a clean PDF package right before the July 31 deadline."
+                        )
+                    }
+                    .padding(.horizontal, DS.lg)
                 }
-                .padding(24)
+                .padding(.bottom, DS.xxl)
             }
-            navFooter(
+            footerBar(
                 back: { step = .welcome },
-                primary: ("Next", { step = .addStudent })
+                primaryLabel: "Next",
+                primaryAction: { step = .addStudent },
+                primaryEnabled: true
             )
         }
-        .navigationTitle("How it works")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func benefitCard(icon: String, title: String, body: String) -> some View {
-        HStack(alignment: .top, spacing: 14) {
+        HStack(alignment: .top, spacing: DS.base) {
             Image(systemName: icon)
-                .font(.title2)
-                .foregroundStyle(.tint)
-                .frame(width: 32)
+                .font(.title3.weight(.semibold))
+                .foregroundStyle(DS.accent)
+                .frame(width: 44, height: 44)
+                .background(DS.accentSoft, in: RoundedRectangle(cornerRadius: 12))
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(.headline)
                 Text(body).font(.subheadline).foregroundStyle(.secondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 14))
+        .padding(DS.lg)
+        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+        .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
     }
 
-    // MARK: 3. Add first student — name + program only (SLP if PEP)
+    // MARK: 3. Add student
 
     private var addStudentScreen: some View {
         VStack(spacing: 0) {
-            Form {
-                Section {
-                    TextField("Student name", text: $draft.displayName)
-                        .textContentType(.name)
-                        .textInputAutocapitalization(.words)
-                } header: {
-                    Text("Student")
-                } footer: {
-                    Text("First name or nickname is fine. You can add a second student later.")
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: DS.lg) {
+                    JournalHeader(eyebrow: "STEP 3 OF 5",
+                                  title: "Add your first student",
+                                  subtitle: "Just the basics. You can add details later.")
 
-                Section {
-                    Picker("Program", selection: $draft.program) {
-                        ForEach(Program.allCases) { p in
-                            Text(p.displayName).tag(p)
+                    VStack(alignment: .leading, spacing: DS.sm) {
+                        Text("STUDENT")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .tracking(0.5)
+                            .padding(.horizontal, DS.lg + 4)
+                        VStack(alignment: .leading, spacing: 0) {
+                            journalField(label: "Name", placeholder: "First name or nickname",
+                                         text: $draft.displayName)
                         }
+                        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                        .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                        .padding(.horizontal, DS.lg)
+                        Text("First name or nickname is fine. You can add a second student later.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                            .padding(.horizontal, DS.lg + 4)
                     }
-                    Button {
-                        showProgramHelp = true
-                    } label: {
-                        Label("Not sure which one?", systemImage: "questionmark.circle")
-                            .font(.subheadline)
-                    }
-                } header: {
-                    Text("Scholarship program")
-                }
 
-                if draft.program == .pep {
-                    Section {
-                        Toggle("SLP has been approved", isOn: Binding(
-                            get: { draft.slpApprovedDate != nil },
-                            set: { newValue in
-                                draft.slpApprovedDate = newValue ? (draft.slpApprovedDate ?? .now) : nil
+                    VStack(alignment: .leading, spacing: DS.sm) {
+                        Text("SCHOLARSHIP PROGRAM")
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(.secondary)
+                            .tracking(0.5)
+                            .padding(.horizontal, DS.lg + 4)
+                        VStack(alignment: .leading, spacing: 0) {
+                            programPickerRow
+                        }
+                        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                        .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                        .padding(.horizontal, DS.lg)
+                        Button {
+                            showProgramHelp = true
+                        } label: {
+                            HStack(spacing: 4) {
+                                Image(systemName: "questionmark.circle")
+                                Text("Not sure which one?")
                             }
-                        ))
-                        if let date = draft.slpApprovedDate {
-                            DatePicker("Approved on",
-                                       selection: Binding(
-                                        get: { date },
-                                        set: { draft.slpApprovedDate = $0 }
-                                       ),
-                                       displayedComponents: .date)
+                            .font(.footnote.weight(.semibold))
+                            .foregroundStyle(DS.accent)
+                            .padding(.horizontal, DS.lg + 4)
                         }
-                    } header: {
-                        Text("Student Learning Plan (PEP)")
-                    } footer: {
-                        Text("Anything purchased before the SLP is approved is permanently ineligible under PEP. There's no appeals process.")
+                    }
+
+                    if draft.program == .pep {
+                        slpSection
+                    }
+
+                    if let saveError {
+                        Text(saveError)
+                            .font(.footnote)
+                            .foregroundStyle(DS.statusBad)
+                            .padding(.horizontal, DS.lg + 4)
                     }
                 }
-
-                Section {
-                    Text("You can add award amount, county, grade level, and notes later from the student detail screen.")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
-                }
+                .padding(.bottom, DS.xxl)
             }
-            if let saveError {
-                Text(saveError)
-                    .font(.footnote)
-                    .foregroundStyle(.red)
-                    .padding(.horizontal, 24)
-            }
-            navFooter(
+            footerBar(
                 back: { step = .howItWorks },
-                primary: ("Next", { saveStudent() }),
+                primaryLabel: "Next",
+                primaryAction: { saveStudent() },
                 primaryEnabled: draft.isValid
             )
         }
-        .navigationTitle("Add your first student")
-        .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $showProgramHelp) {
             ProgramHelpSheet(program: $draft.program)
+        }
+    }
+
+    private var programPickerRow: some View {
+        Menu {
+            ForEach(Program.allCases) { p in
+                Button {
+                    draft.program = p
+                } label: {
+                    HStack {
+                        Text(p.displayName)
+                        if draft.program == p { Image(systemName: "checkmark") }
+                    }
+                }
+            }
+        } label: {
+            HStack {
+                VStack(alignment: .leading, spacing: 2) {
+                    Text("Program")
+                        .font(.caption)
+                        .foregroundStyle(.secondary)
+                    Text(draft.program.displayName)
+                        .font(.body)
+                        .foregroundStyle(.primary)
+                }
+                Spacer()
+                Image(systemName: "chevron.up.chevron.down")
+                    .font(.caption.weight(.semibold))
+                    .foregroundStyle(.tertiary)
+            }
+            .padding(DS.base)
+        }
+    }
+
+    private var slpSection: some View {
+        VStack(alignment: .leading, spacing: DS.sm) {
+            Text("STUDENT LEARNING PLAN (PEP)")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .tracking(0.5)
+                .padding(.horizontal, DS.lg + 4)
+            VStack(spacing: 0) {
+                Toggle(isOn: Binding(
+                    get: { draft.slpApprovedDate != nil },
+                    set: { newValue in
+                        draft.slpApprovedDate = newValue ? (draft.slpApprovedDate ?? .now) : nil
+                    }
+                )) {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("SLP has been approved")
+                            .font(.body)
+                    }
+                }
+                .tint(DS.accent)
+                .padding(DS.base)
+
+                if let date = draft.slpApprovedDate {
+                    Divider().padding(.leading, DS.base)
+                    DatePicker("Approved on",
+                               selection: Binding(
+                                get: { date },
+                                set: { draft.slpApprovedDate = $0 }
+                               ),
+                               displayedComponents: .date)
+                        .padding(DS.base)
+                }
+            }
+            .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+            .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+            .padding(.horizontal, DS.lg)
+            Text("Anything purchased before the SLP is approved is permanently ineligible under PEP. There's no appeals process.")
+                .font(.footnote)
+                .foregroundStyle(.secondary)
+                .padding(.horizontal, DS.lg + 4)
         }
     }
 
@@ -216,127 +304,137 @@ struct OnboardingFlow: View {
         }
     }
 
-    // MARK: 4. Disclaimer — scannable bullets + full text disclosure
+    // MARK: 4. Disclaimer
 
     private var disclaimerScreen: some View {
         VStack(spacing: 0) {
             ScrollView {
-                VStack(alignment: .leading, spacing: 16) {
-                    Text("Two things to know before you go")
-                        .font(.title2.bold())
+                VStack(alignment: .leading, spacing: DS.lg) {
+                    JournalHeader(eyebrow: "STEP 4 OF 5",
+                                  title: "Two things to know")
 
-                    factCard(
-                        icon: "person.slash.fill",
-                        tint: .orange,
-                        title: "We're not Step Up, AAA, or the state",
-                        body: "ScholarKeep is an independent app. It doesn't connect to EMA, SMP, MyScholarShop, Tipalti, or any official portal. You still submit your claims yourself."
-                    )
-
-                    factCard(
-                        icon: "scope",
-                        tint: .blue,
-                        title: "Verdicts are educated estimates",
-                        body: "We mirror the official Purchasing Guide as closely as we can, but rules change every year and your SFO has final say. Always double-check the guide before big purchases."
-                    )
+                    VStack(spacing: DS.md) {
+                        factCard(
+                            icon: "person.slash.fill",
+                            tint: DS.statusWarn,
+                            title: "We're not Step Up, AAA, or the state",
+                            body: "ScholarKeep is an independent app. It doesn't connect to EMA, SMP, MyScholarShop, Tipalti, or any official portal. You still submit your claims yourself."
+                        )
+                        factCard(
+                            icon: "scope",
+                            tint: DS.accent,
+                            title: "Verdicts are educated estimates",
+                            body: "We mirror the official Purchasing Guide as closely as we can, but rules change every year and your SFO has the final say. Always double-check the guide before big purchases."
+                        )
+                    }
+                    .padding(.horizontal, DS.lg)
 
                     DisclosureGroup {
                         Text(DisclaimerCopy.full(schoolYear: SchoolYear.label()))
                             .font(.footnote)
                             .foregroundStyle(.secondary)
-                            .padding(.top, 8)
+                            .padding(.top, DS.sm)
                     } label: {
-                        Label("Read the full disclosure", systemImage: "doc.text")
-                            .font(.subheadline.weight(.semibold))
+                        HStack(spacing: DS.sm) {
+                            Image(systemName: "doc.text")
+                                .font(.subheadline.weight(.semibold))
+                                .foregroundStyle(.secondary)
+                            Text("Read the full disclosure")
+                                .font(.subheadline.weight(.semibold))
+                        }
                     }
-                    .padding(12)
-                    .background(Color.secondary.opacity(0.08), in: RoundedRectangle(cornerRadius: 12))
+                    .padding(DS.base)
+                    .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                    .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                    .padding(.horizontal, DS.lg)
                 }
-                .padding(24)
+                .padding(.bottom, DS.xxl)
             }
-            navFooter(
+            footerBar(
                 back: { step = .addStudent },
-                primary: ("I understand — continue", { step = .preferences })
+                primaryLabel: "I understand — continue",
+                primaryAction: { step = .preferences },
+                primaryEnabled: true
             )
         }
-        .navigationTitle("Disclaimer")
-        .navigationBarTitleDisplayMode(.inline)
     }
 
     private func factCard(icon: String, tint: Color, title: String, body: String) -> some View {
-        HStack(alignment: .top, spacing: 14) {
+        HStack(alignment: .top, spacing: DS.base) {
             Image(systemName: icon)
-                .font(.title2)
+                .font(.title3.weight(.semibold))
                 .foregroundStyle(tint)
-                .frame(width: 32)
+                .frame(width: 36, height: 36)
+                .background(tint.opacity(0.14), in: RoundedRectangle(cornerRadius: 10))
             VStack(alignment: .leading, spacing: 4) {
                 Text(title).font(.headline)
                 Text(body).font(.subheadline).foregroundStyle(.secondary)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(16)
-        .background(tint.opacity(0.1), in: RoundedRectangle(cornerRadius: 14))
+        .padding(DS.lg)
+        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+        .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
     }
 
-    // MARK: 5. Permissions — all optional, skippable
+    // MARK: 5. Preferences
 
     private var preferencesScreen: some View {
         VStack(spacing: 0) {
-            Form {
-                Section {
-                    Toggle(isOn: $enableAppLock) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Lock with \(AppLockService.biometryDescription())")
-                            Text("Require authentication when you open ScholarKeep.")
-                                .font(.footnote).foregroundStyle(.secondary)
-                        }
-                    }
-                    .disabled(!AppLockService.biometryAvailable())
-                } header: {
-                    Text("Privacy")
-                } footer: {
-                    if AppLockService.biometryAvailable() {
-                        Text("Recommended if your phone is shared.")
-                    } else {
-                        Text("Set up a device passcode in Settings to enable app lock.")
-                    }
-                }
+            ScrollView {
+                VStack(alignment: .leading, spacing: DS.lg) {
+                    JournalHeader(eyebrow: "STEP 5 OF 5",
+                                  title: "A few preferences",
+                                  subtitle: "All optional. Change anytime in Settings.")
 
-                Section {
-                    Toggle(isOn: $enableNotifications) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Deadline reminders")
-                            Text("July 31 cutoff, pre-auth windows, and on-hold clocks.")
-                                .font(.footnote).foregroundStyle(.secondary)
-                        }
-                    }
-                } header: {
-                    Text("Reminders")
-                } footer: {
-                    Text("Local notifications only — never sent to a server.")
+                    preferenceCard(
+                        title: "Lock with \(AppLockService.biometryDescription())",
+                        subtitle: AppLockService.biometryAvailable()
+                            ? "Recommended if your phone is shared."
+                            : "Set up a device passcode in Settings to enable.",
+                        isOn: $enableAppLock,
+                        disabled: !AppLockService.biometryAvailable()
+                    )
+                    preferenceCard(
+                        title: "Deadline reminders",
+                        subtitle: "Local notifications for the July 31 cutoff, pre-auth windows, and on-hold clocks.",
+                        isOn: $enableNotifications,
+                        disabled: false
+                    )
+                    preferenceCard(
+                        title: "Back up to iCloud",
+                        subtitle: "Off by default. Saves preference; sync ships in a later release.",
+                        isOn: $enableICloud,
+                        disabled: false
+                    )
                 }
-
-                Section {
-                    Toggle(isOn: $enableICloud) {
-                        VStack(alignment: .leading, spacing: 2) {
-                            Text("Back up to iCloud")
-                            Text("Off by default. Saves your preference; sync ships in a later release.")
-                                .font(.footnote).foregroundStyle(.secondary)
-                        }
-                    }
-                } header: {
-                    Text("Backup")
-                } footer: {
-                    Text("All three of these are optional. You can change them anytime in Settings.")
-                }
+                .padding(.bottom, DS.xxl)
             }
-            navFooter(
+            footerBar(
                 back: { step = .disclaimer },
-                primary: ("Finish", { finishOnboarding() })
+                primaryLabel: "Finish",
+                primaryAction: { finishOnboarding() },
+                primaryEnabled: true
             )
         }
-        .navigationTitle("A few preferences")
-        .navigationBarTitleDisplayMode(.inline)
+    }
+
+    private func preferenceCard(title: String, subtitle: String, isOn: Binding<Bool>, disabled: Bool) -> some View {
+        HStack(alignment: .center, spacing: DS.base) {
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title).font(.body.weight(.semibold))
+                Text(subtitle).font(.footnote).foregroundStyle(.secondary)
+            }
+            Spacer()
+            Toggle("", isOn: isOn)
+                .labelsHidden()
+                .tint(DS.accent)
+                .disabled(disabled)
+        }
+        .padding(DS.lg)
+        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+        .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+        .padding(.horizontal, DS.lg)
     }
 
     private func finishOnboarding() {
@@ -352,28 +450,44 @@ struct OnboardingFlow: View {
         }
     }
 
-    // MARK: Shared nav footer
+    // MARK: Shared helpers
+
+    private func journalField(label: String, placeholder: String, text: Binding<String>) -> some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text(label)
+                .font(.caption)
+                .foregroundStyle(.secondary)
+            TextField(placeholder, text: text)
+                .font(.body)
+                .textContentType(.name)
+                .textInputAutocapitalization(.words)
+                .accessibilityIdentifier("Student name")
+        }
+        .padding(DS.base)
+    }
 
     @ViewBuilder
-    private func navFooter(back: @escaping () -> Void, primary: (String, () -> Void), primaryEnabled: Bool = true) -> some View {
+    private func footerBar(back: @escaping () -> Void,
+                           primaryLabel: String,
+                           primaryAction: @escaping () -> Void,
+                           primaryEnabled: Bool) -> some View {
         VStack(spacing: 0) {
             Divider()
-            HStack {
+                .opacity(0.4)
+            HStack(spacing: DS.base) {
                 Button("Back", action: back)
-                    .buttonStyle(.plain)
+                    .font(.body.weight(.semibold))
                     .foregroundStyle(.secondary)
+                    .padding(.vertical, 14)
+                    .padding(.horizontal, 8)
                 Spacer()
-                Button {
-                    primary.1()
-                } label: {
-                    Text(primary.0)
-                        .frame(minWidth: 140)
-                }
-                .buttonStyle(.borderedProminent)
-                .disabled(!primaryEnabled)
+                JournalCTA(primaryLabel, isDisabled: !primaryEnabled, action: primaryAction)
+                    .frame(maxWidth: 240)
             }
-            .padding(20)
+            .padding(.horizontal, DS.lg)
+            .padding(.vertical, DS.sm)
+            .padding(.bottom, DS.xs)
         }
-        .background(.regularMaterial)
+        .background(.ultraThinMaterial)
     }
 }

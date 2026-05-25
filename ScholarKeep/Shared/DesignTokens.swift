@@ -76,12 +76,30 @@ extension View {
         self.background(DS.canvas.ignoresSafeArea())
     }
 
-    /// Wrap content in a v0.5.0 card: white-on-canvas, single radius, no shadow.
+    /// Hide the default scroll background so DS.canvas shows through (Forms/Lists).
+    func dsScrollCanvas() -> some View {
+        self
+            .scrollContentBackground(.hidden)
+            .background(DS.canvas)
+    }
+
+    /// Wrap content in a v0.5.1 card: white on cream canvas, single radius,
+    /// soft warm shadow for analog/paper depth (Apple Journal style).
     func dsCard(padding: CGFloat = DS.lg) -> some View {
         self
             .padding(padding)
             .frame(maxWidth: .infinity, alignment: .leading)
             .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+            .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+    }
+
+    /// Editorial large title — Apple Journal header style.
+    /// Use as the visual hook at the top of a screen, with `subtitle` for context.
+    func journalTitle() -> some View {
+        self
+            .font(.system(size: 34, weight: .bold, design: .default))
+            .tracking(-0.4)
+            .foregroundStyle(.primary)
     }
 }
 

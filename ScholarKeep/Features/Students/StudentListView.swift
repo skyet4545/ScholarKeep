@@ -35,6 +35,8 @@ struct StudentListView: View {
                     )
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.canvas)
             .navigationTitle("Students")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

@@ -52,6 +52,8 @@ struct ExpenseListView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.canvas)
             .navigationTitle("Expenses")
             .toolbar {
                 ToolbarItem(placement: .primaryAction) {

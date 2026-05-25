@@ -62,6 +62,8 @@ struct SettingsView: View {
                 dataSection
                 aboutSection
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.canvas)
             .navigationTitle("Settings")
             .task {
                 let status = await UNUserNotificationCenter.current().notificationSettings().authorizationStatus

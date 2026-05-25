@@ -47,6 +47,8 @@ struct ClaimsBoardView: View {
                     }
                 }
             }
+            .scrollContentBackground(.hidden)
+            .background(DS.canvas)
             .navigationTitle("Claims")
         }
     }
