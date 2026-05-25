@@ -10,8 +10,8 @@ options:
 
 settings:
   base:
-    MARKETING_VERSION: "0.5.2"
-    CURRENT_PROJECT_VERSION: "9"
+    MARKETING_VERSION: "0.6.0"
+    CURRENT_PROJECT_VERSION: "10"
     SWIFT_VERSION: "5.9"
     DEVELOPMENT_TEAM: "846N5D6TMK"
     IPHONEOS_DEPLOYMENT_TARGET: "17.0"
@@ -29,6 +29,8 @@ targets:
           - "**/.DS_Store"
     resources:
       - path: ScholarKeep/Resources/Assets.xcassets
+    dependencies:
+      - target: ScholarKeepShareExtension
     settings:
       base:
         PRODUCT_BUNDLE_IDENTIFIER: com.carlosreyes.scholarkeep
@@ -51,6 +53,23 @@ targets:
         ENABLE_PREVIEWS: YES
         SWIFT_EMIT_LOC_STRINGS: YES
         CODE_SIGN_ENTITLEMENTS: ScholarKeep/ScholarKeep.entitlements
+
+  ScholarKeepShareExtension:
+    type: app-extension
+    platform: iOS
+    sources:
+      - path: ScholarKeepShareExtension
+        excludes:
+          - "Info.plist"
+      - path: ScholarKeep/Shared/ShareInbox.swift
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.carlosreyes.scholarkeep.share
+        PRODUCT_NAME: ScholarKeepShare
+        CODE_SIGN_ENTITLEMENTS: ScholarKeepShareExtension/ShareExtension.entitlements
+        INFOPLIST_FILE: ScholarKeepShareExtension/Info.plist
+        SKIP_INSTALL: YES
+        SWIFT_EMIT_LOC_STRINGS: YES
 
   ScholarKeepTests:
     type: bundle.unit-test

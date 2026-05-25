@@ -3,6 +3,10 @@ import SwiftData
 
 struct RootView: View {
     @Environment(AppSettings.self) private var settings
+    @Environment(\.scenePhase) private var scenePhase
+
+    @State private var pendingShares: [ShareInbox.PendingShare] = []
+    @State private var showSharedInbox = false
 
     private var bypassAuth: Bool {
         CommandLine.arguments.contains("--reset") ||
@@ -21,6 +25,22 @@ struct RootView: View {
             } else {
                 SignInGate { gatedContent }
             }
+        }
+        .onAppear { checkSharedInbox() }
+        .onChange(of: scenePhase) { _, newPhase in
+            if newPhase == .active { checkSharedInbox() }
+        }
+        .sheet(isPresented: $showSharedInbox) {
+            SharedInboxImportSheet(pending: pendingShares)
+                .interactiveDismissDisabled(false)
+        }
+    }
+
+    private func checkSharedInbox() {
+        let items = ShareInbox.pending()
+        if !items.isEmpty && settings.hasCompletedOnboarding {
+            pendingShares = items
+            showSharedInbox = true
         }
     }
 
