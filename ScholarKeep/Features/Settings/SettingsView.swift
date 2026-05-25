@@ -253,17 +253,60 @@ struct SettingsView: View {
 
     @ViewBuilder
     private var aboutSection: some View {
-        Section("About") {
+        Section {
+            if let feedbackURL = feedbackMailtoURL() {
+                Link(destination: feedbackURL) {
+                    Label("Send feedback to Carlos", systemImage: "envelope.fill")
+                        .foregroundStyle(.tint)
+                }
+            }
             Button("View disclaimer") { showDisclaimer = true }
             LabeledContent("Version", value: appVersionString)
-            LabeledContent("Today", value: Date().formatted(date: .long, time: .omitted))
             if let phone = RulesetLoader.shared.ruleset?.globalRules.stepUpSupportPhone, let url = URL(string: "tel:\(phone.filter { $0.isNumber || $0 == "+" })") {
                 Link(destination: url) {
                     LabeledContent("Step Up support", value: phone)
                 }
             }
+        } header: { Text("About") } footer: {
+            Text("Beta: tap “Send feedback” for anything broken, confusing, or missing. One sentence is fine.")
         }
         accountSection
+    }
+
+    /// Builds a mailto: URL with a structured body so feedback is easier to triage.
+    private func feedbackMailtoURL() -> URL? {
+        let to = "carlos.reyesiii@gmail.com"
+        let subject = "ScholarKeep feedback — v\(appVersionString)"
+
+        let activeProgram: String = {
+            guard let id = settings.activeStudentID,
+                  let student = students.first(where: { $0.id == id }) else { return "—" }
+            return student.program.shortName
+        }()
+        let device = UIDevice.current.model
+        let osVersion = UIDevice.current.systemVersion
+        let stats = "Students: \(students.count) · Expenses: \(expenses.count) · Claims: \(claims.count)"
+
+        let body = """
+
+
+        ⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯⎯
+        (Type your feedback above this line — one sentence is fine.)
+
+        App version: \(appVersionString)
+        Device: \(device) · iOS \(osVersion)
+        Active program: \(activeProgram)
+        \(stats)
+        """
+
+        var components = URLComponents()
+        components.scheme = "mailto"
+        components.path = to
+        components.queryItems = [
+            URLQueryItem(name: "subject", value: subject),
+            URLQueryItem(name: "body", value: body)
+        ]
+        return components.url
     }
 
     private var accountSection: some View {
