@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>ScholarKeep v0.5.0 Prototype</title>
+<link rel="stylesheet" href="style.css" />
+</head>
+<body data-theme="light">
+
+<header class="topbar">
+  <div class="brand">ScholarKeep <span class="tag">v0.5.0 prototype</span></div>
+  <div class="controls">
+    <select id="screen-jump" aria-label="Jump to screen"></select>
+    <button id="theme-toggle" aria-label="Toggle dark mode">🌗</button>
+  </div>
+</header>
+
+<main class="stage">
+  <div class="phone" id="phone">
+    <div class="notch"></div>
+    <div class="screen" id="screen-mount"></div>
+    <div class="home-indicator"></div>
+  </div>
+
+  <aside class="sidebar">
+    <h2>Screens</h2>
+    <ol class="screen-list" id="screen-list"></ol>
+    <hr/>
+    <h2>How to use</h2>
+    <p class="hint">Click a screen on the left, or tap the tab bar / buttons inside the phone to navigate. Toggle dark mode with 🌗 to see both palettes.</p>
+    <p class="hint"><strong>This is a prototype</strong> — copy, layout, and density mirror what we'd build in SwiftUI. SF Pro substituted with -apple-system. SF Symbols substituted with web-safe Unicode + inline SVG.</p>
+  </aside>
+</main>
+
+<script src="screens.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
