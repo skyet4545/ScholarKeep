@@ -309,8 +309,11 @@ struct SettingsView: View {
         return components.url
     }
 
+    @State private var showDeleteAccountConfirm = false
+    @State private var showDeleteAccountSecondConfirm = false
+
     private var accountSection: some View {
-        Section("Account") {
+        Section {
             if case .signedIn(let user) = AuthService.shared.state {
                 LabeledContent("Signed in as") {
                     VStack(alignment: .trailing) {
@@ -329,8 +332,58 @@ struct SettingsView: View {
                 } label: {
                     Label("Sign out", systemImage: "rectangle.portrait.and.arrow.right")
                 }
+                Button(role: .destructive) {
+                    showDeleteAccountConfirm = true
+                } label: {
+                    Label("Delete account", systemImage: "person.crop.circle.badge.xmark")
+                }
+                .accessibilityIdentifier("deleteAccountButton")
             }
+        } header: {
+            Text("Account")
+        } footer: {
+            Text("Sign out preserves your local data. Delete account wipes every student, expense, claim, attachment, and Apple ID link from this device.")
         }
+        .confirmationDialog(
+            "Delete your account?",
+            isPresented: $showDeleteAccountConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Continue", role: .destructive) { showDeleteAccountSecondConfirm = true }
+            Button("Cancel", role: .cancel) { }
+        } message: {
+            Text("This removes every student, expense, claim, and attachment from this device, then signs you out. It does not affect anything in EMA, SMP, or Step Up. You can sign back in later to start fresh.")
+        }
+        .confirmationDialog(
+            "Are you absolutely sure? This can't be undone.",
+            isPresented: $showDeleteAccountSecondConfirm,
+            titleVisibility: .visible
+        ) {
+            Button("Delete everything and sign out", role: .destructive) { deleteAccountAndSignOut() }
+            Button("Cancel", role: .cancel) { }
+        }
+    }
+
+    /// Wipes all local data, resets settings, and signs out of Apple — the full
+    /// "delete account" path required by Apple Guideline 5.1.1(v).
+    private func deleteAccountAndSignOut() {
+        // Wipe all records
+        for c in claims { modelContext.delete(c) }
+        for e in expenses { modelContext.delete(e) }
+        for s in students { modelContext.delete(s) }
+        try? modelContext.save()
+
+        // Reset settings so the user lands fresh on next launch
+        settings.activeStudentID = nil
+        settings.hasCompletedOnboarding = false
+        settings.appLockEnabled = false
+        settings.iCloudBackupEnabled = false
+
+        // Cancel any scheduled notifications
+        Task { await NotificationsService.cancelAll() }
+
+        // Sign out (clears the stored Apple ID identifier)
+        Task { @MainActor in AuthService.shared.signOut() }
     }
 
     private var lockToggleBinding: Binding<Bool> {

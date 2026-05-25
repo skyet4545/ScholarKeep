@@ -90,6 +90,8 @@ struct DashboardView: View {
                     Image(systemName: "plus")
                         .font(.title3.weight(.semibold))
                 }
+                .accessibilityLabel("Add receipt")
+                .accessibilityHint("Scan with camera or pick from your photo library")
             }
         }
     }
