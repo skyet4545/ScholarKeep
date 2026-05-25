@@ -8,11 +8,11 @@ For Florida homeschool / FES-UA / FES-EO / PEP Facebook groups + FPEA channels +
 
 > Hey FL homeschool families 👋
 >
-> I'm a homeschool dad here in Florida, and like a lot of you I spend the back half of every July hunched over a folder of receipts trying to remember which ones I already submitted, which ones need a pre-auth I forgot about, and what the SFO is going to push back on this time.
+> A few of us are homeschool dads here in Florida, and like a lot of you we spend the back half of every July hunched over a folder of receipts trying to remember which ones we already submitted, which ones need a pre-auth we forgot about, and what the SFO is going to push back on this time.
 >
-> I built an iPhone app for our family called **ScholarKeep** to make this whole thing less awful. It scans receipts in one tap, tells you on the spot whether something is eligible (citing the actual line of the Purchasing Guide), tracks every claim from draft to paid, and reminds you about the July 31 cliff. Nothing leaves your phone — no servers, no analytics, no third-party trackers. It works for FES-UA, FES-EO, and PEP.
+> So we built an iPhone app called **ScholarKeep** to make this whole thing less awful. It scans receipts in one tap, tells you on the spot whether something is eligible (citing the actual line of the Purchasing Guide), tracks every claim from draft to paid, and reminds you about the July 31 cliff. Nothing leaves your phone — no servers, no analytics, no third-party trackers. Works for FES-UA, FES-EO, and PEP.
 >
-> Looking for 5-10 Florida homeschool parents who'd be willing to try it for a couple weeks and tell me what's wrong with it before I open it up more broadly. Free for the beta (and most features stay free forever). iPhone only for now.
+> Looking for 5-10 Florida homeschool parents who'd be willing to try it for a couple weeks and tell us what's wrong with it before we open it up more broadly. Free for the beta (and most features stay free forever). iPhone only for now.
 >
 > If you're interested, drop a 🙋 below or DM me and I'll send the TestFlight link.
 
@@ -20,7 +20,7 @@ For Florida homeschool / FES-UA / FES-EO / PEP Facebook groups + FPEA channels +
 
 ## Version 2 — FB post (shorter, conversational)
 
-> Florida homeschool moms — I built an iPhone app to handle ESA scholarship receipts and submissions because I was tired of doing it on paper every July. Scans receipts, tells you what's eligible right then citing the official guide, tracks your claims, reminds you about deadlines. Local-only, no servers. Works for FES-UA, FES-EO, and PEP.
+> Florida homeschool moms — a few of us dads built an iPhone app to handle ESA scholarship receipts and submissions because we were tired of doing it on paper every July. Scans receipts, tells you what's eligible right then citing the official guide, tracks your claims, reminds you about deadlines. Local-only, no servers. Works for FES-UA, FES-EO, and PEP.
 >
 > Looking for 5 beta testers. DM me if you want the link.
 
