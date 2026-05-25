@@ -130,7 +130,9 @@
       }
       .founder-quote { font-size: 22px; line-height: 1.5; font-weight: 500; color: var(--ink); margin: 0 0 24px; letter-spacing: -0.01em; }
       .founder-attribution { display: flex; align-items: center; gap: 14px; font-size: 14px; color: var(--muted); }
-      .founder-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; }
+      .founder-avatars { display: flex; }
+      .founder-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--accent-soft); color: var(--accent); display: flex; align-items: center; justify-content: center; font-weight: 700; border: 2px solid white; }
+      .founder-avatar.second { margin-left: -14px; background: #efece6; color: #6b6760; }
 
       /* Use cases */
       .usecases { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
@@ -304,10 +306,13 @@
             "We're homeschool dads here in Florida. Every July we'd lose half a Saturday hunched over a folder of receipts trying to remember which ones we'd already submitted, which ones needed a pre-auth, and what the SFO was going to push back on. So we built this for our own families first. We use it every week."
           </p>
           <div class="founder-attribution">
-            <div class="founder-avatar">CR</div>
+            <div class="founder-avatars">
+              <div class="founder-avatar">C</div>
+              <div class="founder-avatar second">R</div>
+            </div>
             <div>
-              <div style="color: var(--ink); font-weight: 600;">Carlos Reyes &amp; team</div>
-              <div>FL homeschool dads · FES-UA, FES-EO, PEP families</div>
+              <div style="color: var(--ink); font-weight: 600;">Carlos &amp; Ramsey</div>
+              <div>FL homeschool dads · using ScholarKeep with our own families</div>
             </div>
           </div>
         </div>
