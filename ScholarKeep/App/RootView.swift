@@ -19,21 +19,19 @@ struct RootView: View {
     }
 
     var body: some View {
-        Group {
-            if bypassAuth {
-                gatedContent
-            } else {
-                SignInGate { gatedContent }
+        // v0.6.3: Sign in with Apple is now OPTIONAL — moved from launch-gate
+        // to an in-Settings choice. The first 5 minutes of the app are
+        // available anonymously (Bear pattern). Apple ID is only required
+        // when the user enables iCloud sync (shipping in v0.7).
+        gatedContent
+            .onAppear { checkSharedInbox() }
+            .onChange(of: scenePhase) { _, newPhase in
+                if newPhase == .active { checkSharedInbox() }
             }
-        }
-        .onAppear { checkSharedInbox() }
-        .onChange(of: scenePhase) { _, newPhase in
-            if newPhase == .active { checkSharedInbox() }
-        }
-        .sheet(isPresented: $showSharedInbox) {
-            SharedInboxImportSheet(pending: pendingShares)
-                .interactiveDismissDisabled(false)
-        }
+            .sheet(isPresented: $showSharedInbox) {
+                SharedInboxImportSheet(pending: pendingShares)
+                    .interactiveDismissDisabled(false)
+            }
     }
 
     private func checkSharedInbox() {

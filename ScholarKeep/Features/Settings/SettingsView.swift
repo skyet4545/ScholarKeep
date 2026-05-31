@@ -29,29 +29,17 @@ struct SettingsView: View {
                 subscriptionSection
                 privacySection
                 Section {
-                    Toggle(isOn: Binding(
-                        get: { bindableSettings.iCloudBackupEnabled && subs.isPro },
-                        set: { newValue in
-                            if newValue && !subs.isPro {
-                                showPaywall = true
-                            } else {
-                                bindableSettings.iCloudBackupEnabled = newValue
-                            }
-                        }
-                    )) {
-                        HStack {
-                            VStack(alignment: .leading, spacing: 2) {
-                                Text("Back up to iCloud")
-                                Text("Preference saved. Pro required to enable sync.")
-                                    .font(.footnote).foregroundStyle(.secondary)
-                            }
-                            Spacer()
-                            if !subs.isPro {
-                                Text("PRO").font(.caption2.bold())
-                                    .padding(.horizontal, 6).padding(.vertical, 2)
-                                    .background(Color.accentColor, in: Capsule())
-                                    .foregroundStyle(.white)
-                            }
+                    HStack(alignment: .top, spacing: 12) {
+                        Image(systemName: "icloud")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 28)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("iCloud backup")
+                                .font(.body.weight(.semibold))
+                            Text("Coming in v0.7. Right now ScholarKeep lives entirely on this device — if you switch phones or delete the app, you'll start fresh. Real CloudKit sync is the next thing we're shipping.")
+                                .font(.footnote)
+                                .foregroundStyle(.secondary)
                         }
                     }
                 } header: { Text("Backup") } footer: {
@@ -315,34 +303,18 @@ struct SettingsView: View {
     private var accountSection: some View {
         Section {
             if case .signedIn(let user) = AuthService.shared.state {
-                LabeledContent("Signed in as") {
-                    VStack(alignment: .trailing) {
-                        if let given = user.givenName, let family = user.familyName {
-                            Text("\(given) \(family)").font(.subheadline)
-                        }
-                        if let email = user.email {
-                            Text(email).font(.caption).foregroundStyle(.secondary)
-                        } else {
-                            Text("Apple ID").font(.caption).foregroundStyle(.secondary)
-                        }
-                    }
-                }
-                Button(role: .destructive) {
-                    Task { @MainActor in AuthService.shared.signOut() }
-                } label: {
-                    Label("Sign out", systemImage: "rectangle.portrait.and.arrow.right")
-                }
-                Button(role: .destructive) {
-                    showDeleteAccountConfirm = true
-                } label: {
-                    Label("Delete account", systemImage: "person.crop.circle.badge.xmark")
-                }
-                .accessibilityIdentifier("deleteAccountButton")
+                signedInAccountRows(user: user)
+            } else {
+                signedOutAccountRows
             }
         } header: {
             Text("Account")
         } footer: {
-            Text("Sign out preserves your local data. Delete account wipes every student, expense, claim, attachment, and Apple ID link from this device.")
+            if case .signedIn = AuthService.shared.state {
+                Text("Sign out preserves your local data. Delete account wipes every student, expense, claim, attachment, and Apple ID link from this device.")
+            } else {
+                Text("Sign in with Apple is optional. You'll need it when iCloud backup ships in v0.7 — until then, ScholarKeep works anonymously on this device.")
+            }
         }
         .confirmationDialog(
             "Delete your account?",
@@ -362,6 +334,51 @@ struct SettingsView: View {
             Button("Delete everything and sign out", role: .destructive) { deleteAccountAndSignOut() }
             Button("Cancel", role: .cancel) { }
         }
+    }
+
+    @State private var showSignInSheet = false
+
+    @ViewBuilder
+    private var signedOutAccountRows: some View {
+        Button {
+            showSignInSheet = true
+        } label: {
+            Label("Sign in with Apple", systemImage: "apple.logo")
+                .foregroundStyle(.tint)
+        }
+        .sheet(isPresented: $showSignInSheet) {
+            SignInGate {
+                // Dismiss as soon as auth succeeds — gated content is the sheet itself dismissing.
+                Color.clear.onAppear { showSignInSheet = false }
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func signedInAccountRows(user: SignedInUser) -> some View {
+        LabeledContent("Signed in as") {
+            VStack(alignment: .trailing) {
+                if let given = user.givenName, let family = user.familyName {
+                    Text("\(given) \(family)").font(.subheadline)
+                }
+                if let email = user.email {
+                    Text(email).font(.caption).foregroundStyle(.secondary)
+                } else {
+                    Text("Apple ID").font(.caption).foregroundStyle(.secondary)
+                }
+            }
+        }
+        Button(role: .destructive) {
+            Task { @MainActor in AuthService.shared.signOut() }
+        } label: {
+            Label("Sign out", systemImage: "rectangle.portrait.and.arrow.right")
+        }
+        Button(role: .destructive) {
+            showDeleteAccountConfirm = true
+        } label: {
+            Label("Delete account", systemImage: "person.crop.circle.badge.xmark")
+        }
+        .accessibilityIdentifier("deleteAccountButton")
     }
 
     /// Wipes all local data, resets settings, and signs out of Apple — the full

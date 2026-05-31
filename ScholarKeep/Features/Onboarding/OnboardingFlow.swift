@@ -401,12 +401,23 @@ struct OnboardingFlow: View {
                         isOn: $enableNotifications,
                         disabled: false
                     )
-                    preferenceCard(
-                        title: "Back up to iCloud",
-                        subtitle: "Off by default. Saves preference; sync ships in a later release.",
-                        isOn: $enableICloud,
-                        disabled: false
-                    )
+                    HStack(alignment: .top, spacing: DS.base) {
+                        Image(systemName: "icloud")
+                            .font(.title3)
+                            .foregroundStyle(.secondary)
+                            .frame(width: 28)
+                        VStack(alignment: .leading, spacing: 4) {
+                            Text("iCloud backup")
+                                .font(.body.weight(.semibold))
+                            Text("Coming in v0.7. For now your records live entirely on this device.")
+                                .font(.footnote).foregroundStyle(.secondary)
+                        }
+                        Spacer()
+                    }
+                    .padding(DS.lg)
+                    .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+                    .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+                    .padding(.horizontal, DS.lg)
                 }
                 .padding(.bottom, DS.xxl)
             }

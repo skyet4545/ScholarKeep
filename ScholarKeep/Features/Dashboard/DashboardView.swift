@@ -47,10 +47,14 @@ struct DashboardView: View {
                     StudentStripView()
                     if activeStudent != nil {
                         heroBalance
-                        quickStatGrid
-                        unclaimedReceiptsCard
-                        upcomingRemindersCard
-                        recentActivitySection
+                        if myExpenses.isEmpty && myClaims.isEmpty {
+                            firstRunCoachCard
+                        } else {
+                            quickStatGrid
+                            unclaimedReceiptsCard
+                            upcomingRemindersCard
+                            recentActivitySection
+                        }
                         keyDatesSection
                     } else {
                         emptyState
@@ -176,6 +180,58 @@ struct DashboardView: View {
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(DS.base)
         .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+    }
+
+    // MARK: First-run coach card — fills the empty dashboard with guidance
+
+    private var firstRunCoachCard: some View {
+        VStack(alignment: .leading, spacing: DS.md) {
+            HStack(spacing: DS.md) {
+                Image(systemName: "sparkles")
+                    .font(.title3.weight(.semibold))
+                    .foregroundStyle(DS.accent)
+                    .frame(width: 44, height: 44)
+                    .background(DS.accentSoft, in: RoundedRectangle(cornerRadius: 12))
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(activeStudent.map { "\($0.displayName)'s dashboard" } ?? "Your dashboard")
+                        .font(.headline)
+                    Text("This is where the balance, recent receipts, and deadlines will show up.")
+                        .font(.footnote)
+                        .foregroundStyle(.secondary)
+                }
+            }
+            Divider().padding(.vertical, 4)
+            VStack(alignment: .leading, spacing: DS.sm) {
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Tap **+** at the top right to scan your first receipt.").font(.subheadline)
+                        Text("Camera or photo library — both work.").font(.caption).foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "1.circle.fill").foregroundStyle(DS.accent)
+                }
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Or share a receipt from Mail, Safari, or Files.").font(.subheadline)
+                        Text("Tap Share → ScholarKeep in any iPhone app.").font(.caption).foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "2.circle.fill").foregroundStyle(DS.accent)
+                }
+                Label {
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text("Use the Check tab to ask 'Can I buy this?' before you do.").font(.subheadline)
+                        Text("Get the verdict with the official guide cited.").font(.caption).foregroundStyle(.secondary)
+                    }
+                } icon: {
+                    Image(systemName: "3.circle.fill").foregroundStyle(DS.accent)
+                }
+            }
+        }
+        .padding(DS.xl)
+        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
+        .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+        .padding(.horizontal, DS.base)
     }
 
     // MARK: Unclaimed receipts — one-tap auto-group into a claim

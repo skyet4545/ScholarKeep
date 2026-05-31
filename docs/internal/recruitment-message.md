@@ -8,13 +8,15 @@ For Florida homeschool / FES-UA / FES-EO / PEP Facebook groups + FPEA channels +
 
 > Hey FL homeschool families 👋
 >
-> A few of us are homeschool dads here in Florida, and like a lot of you we spend the back half of every July hunched over a folder of receipts trying to remember which ones we already submitted, which ones need a pre-auth we forgot about, and what the SFO is going to push back on this time.
+> A couple of us are homeschool dads here in Florida (I'm Carlos in Lutz, my FES-UA family is on year 3), and like a lot of you we spend the back half of every July hunched over a folder of receipts trying to remember which ones we already submitted, which ones need a pre-auth we forgot about, and what the SFO is going to push back on this time.
 >
 > So we built an iPhone app called **ScholarKeep** to make this whole thing less awful. It scans receipts in one tap, tells you on the spot whether something is eligible (citing the actual line of the Purchasing Guide), tracks every claim from draft to paid, and reminds you about the July 31 cliff. Nothing leaves your phone — no servers, no analytics, no third-party trackers. Works for FES-UA, FES-EO, and PEP.
 >
 > Looking for 5-10 Florida homeschool parents who'd be willing to try it for a couple weeks and tell us what's wrong with it before we open it up more broadly. Free for the beta (and most features stay free forever). iPhone only for now.
 >
-> If you're interested, drop a 🙋 below or DM me and I'll send the TestFlight link.
+> If you're interested, drop a 🙋 below or DM me and I'll send the TestFlight link. Happy to send a screenshot of my own Step Up parent portal if you want proof I'm actually doing this 😅
+>
+> — Carlos in Lutz, FES-UA dad
 
 ---
 
