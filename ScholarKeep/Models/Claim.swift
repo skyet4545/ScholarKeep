@@ -22,8 +22,8 @@ final class Claim {
     var createdAt: Date = Date.now
 
     var student: Student?
-    @Relationship(deleteRule: .nullify, inverse: \Expense.claim) var expenses: [Expense] = []
-    @Relationship(deleteRule: .cascade, inverse: \StatusEvent.claim) var statusEvents: [StatusEvent] = []
+    @Relationship(deleteRule: .nullify, inverse: \Expense.claim) var expenses: [Expense]? = []
+    @Relationship(deleteRule: .cascade, inverse: \StatusEvent.claim) var statusEvents: [StatusEvent]? = []
 
     init(
         id: UUID = UUID(),

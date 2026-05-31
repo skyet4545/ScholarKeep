@@ -40,7 +40,7 @@ enum PDFExportService {
             drawDisclaimerHeader(at: &y)
             drawExpenseSummary(expense, at: &y, ctx: ctx)
             drawChecklist(expense.readinessChecklist, at: &y, ctx: ctx)
-            for attachment in expense.attachments {
+            for attachment in (expense.attachments ?? []) {
                 ctx.beginPage()
                 drawAttachmentPage(attachment, ctx: ctx)
             }
@@ -60,13 +60,13 @@ enum PDFExportService {
             drawTitle("Claim — \(claim.title)", at: &y)
             drawDisclaimerHeader(at: &y)
             drawClaimSummary(claim, at: &y, ctx: ctx)
-            for expense in claim.expenses {
+            for expense in (claim.expenses ?? []) {
                 ctx.beginPage()
                 var ey: CGFloat = 36
                 drawTitle("Expense — \(expense.vendorName.isEmpty ? "—" : expense.vendorName)", at: &ey)
                 drawExpenseSummary(expense, at: &ey, ctx: ctx)
                 drawChecklist(expense.readinessChecklist, at: &ey, ctx: ctx)
-                for attachment in expense.attachments {
+                for attachment in (expense.attachments ?? []) {
                     ctx.beginPage()
                     drawAttachmentPage(attachment, ctx: ctx)
                 }
@@ -128,11 +128,12 @@ enum PDFExportService {
             drawSubtitle("Eligibility reason", at: &y)
             drawParagraph(expense.eligibilityReason, at: &y)
         }
-        if !expense.lineItems.isEmpty {
+        let items = expense.lineItems ?? []
+        if !items.isEmpty {
             ensureRoom(40, &y, ctx: ctx)
             y += 4
             drawSubtitle("Line items", at: &y)
-            for item in expense.lineItems {
+            for item in items {
                 ensureRoom(20, &y, ctx: ctx)
                 drawKeyValue(item.descriptionText, item.amount.formatted(.currency(code: expense.currency)), at: &y)
             }
@@ -153,7 +154,8 @@ enum PDFExportService {
     }
 
     private static func drawClaimSummary(_ claim: Claim, at y: inout CGFloat, ctx: UIGraphicsPDFRendererContext) {
-        let total = claim.expenses.reduce(Decimal(0)) { $0 + $1.total }
+        let claimExpenses = claim.expenses ?? []
+        let total = claimExpenses.reduce(Decimal(0)) { $0 + $1.total }
         let rows: [(String, String)] = [
             ("Title", claim.title),
             ("Status", claim.status.displayName),
@@ -165,7 +167,7 @@ enum PDFExportService {
             ("Expected payout", claim.expectedPayout?.formatted(.currency(code: "USD")) ?? "—"),
             ("Actual payout", claim.actualPayout?.formatted(.currency(code: "USD")) ?? "—"),
             ("Total of expenses", total.formatted(.currency(code: "USD"))),
-            ("Expense count", "\(claim.expenses.count)")
+            ("Expense count", "\(claimExpenses.count)")
         ]
         for (k, v) in rows {
             ensureRoom(20, &y, ctx: ctx)

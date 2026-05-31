@@ -32,7 +32,7 @@ struct AddToClaimSheet: View {
                             } label: {
                                 VStack(alignment: .leading) {
                                     Text(claim.title).font(.headline)
-                                    Text("\(claim.expenses.count) expense(s)")
+                                    Text("\((claim.expenses ?? []).count) expense(s)")
                                         .font(.caption)
                                         .foregroundStyle(.secondary)
                                 }
@@ -73,22 +73,26 @@ struct AddToClaimSheet: View {
     }
 
     private func addTo(claim: Claim) {
-        let vendors = Set((claim.expenses + [expense]).map { $0.vendorName.lowercased() }.filter { !$0.isEmpty })
+        let existingExpenses = claim.expenses ?? []
+        let vendors = Set((existingExpenses + [expense]).map { $0.vendorName.lowercased() }.filter { !$0.isEmpty })
         let mixesVendors = vendors.count > 1
 
         expense.claim = claim
-        if !claim.expenses.contains(where: { $0.id == expense.id }) {
-            claim.expenses.append(expense)
+        if claim.expenses == nil { claim.expenses = [] }
+        if !(claim.expenses ?? []).contains(where: { $0.id == expense.id }) {
+            claim.expenses?.append(expense)
         }
-        if claim.statusEvents.isEmpty {
+        if (claim.statusEvents ?? []).isEmpty {
+            if claim.statusEvents == nil { claim.statusEvents = [] }
             let event = StatusEvent(status: .draft, date: .now, note: "Created from expense.", claim: claim)
-            claim.statusEvents.append(event)
+            claim.statusEvents?.append(event)
         }
         // If we mixed vendors, leave a status note on the claim so it's visible later.
         if mixesVendors {
             let warning = "Heads up: this claim now mixes vendors (\(vendors.joined(separator: ", "))). The portal requires one provider per claim — consider splitting."
             let event = StatusEvent(status: claim.status, date: .now, note: warning, claim: claim)
-            claim.statusEvents.append(event)
+            if claim.statusEvents == nil { claim.statusEvents = [] }
+            claim.statusEvents?.append(event)
         }
         do {
             try modelContext.save()

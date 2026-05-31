@@ -186,16 +186,17 @@ struct ExpenseDetailView: View {
                     }
                     .font(.caption)
                 }
-            } else if let student = expense.student, !student.providers.isEmpty {
+            } else if let student = expense.student, !(student.providers ?? []).isEmpty {
+                let providers = student.providers ?? []
                 Picker("Provider", selection: Binding(
                     get: { expense.provider?.id },
                     set: { newID in
-                        expense.provider = student.providers.first { $0.id == newID }
+                        expense.provider = providers.first { $0.id == newID }
                         try? modelContext.save()
                     }
                 )) {
                     Text("None").tag(UUID?.none)
-                    ForEach(student.providers) { p in
+                    ForEach(providers) { p in
                         Text(p.name).tag(UUID?.some(p.id))
                     }
                 }
@@ -215,16 +216,17 @@ struct ExpenseDetailView: View {
                     }
                     .font(.caption)
                 }
-            } else if let student = expense.student, !student.preAuthorizations.isEmpty {
+            } else if let student = expense.student, !(student.preAuthorizations ?? []).isEmpty {
+                let preAuths = student.preAuthorizations ?? []
                 Picker("Pre-authorization", selection: Binding(
                     get: { expense.preAuthorization?.id },
                     set: { newID in
-                        expense.preAuthorization = student.preAuthorizations.first { $0.id == newID }
+                        expense.preAuthorization = preAuths.first { $0.id == newID }
                         try? modelContext.save()
                     }
                 )) {
                     Text("None").tag(UUID?.none)
-                    ForEach(student.preAuthorizations) { pa in
+                    ForEach(preAuths) { pa in
                         Text(pa.itemDescription).tag(UUID?.some(pa.id))
                     }
                 }
@@ -233,8 +235,9 @@ struct ExpenseDetailView: View {
     }
 
     private var refundsSection: some View {
-        Section {
-            ForEach(expense.refunds) { refund in
+        let refunds = expense.refunds ?? []
+        return Section {
+            ForEach(refunds) { refund in
                 HStack {
                     VStack(alignment: .leading) {
                         Text(refund.reason.isEmpty ? "Refund" : refund.reason)
@@ -249,12 +252,13 @@ struct ExpenseDetailView: View {
                 }
             }
             .onDelete { offsets in
-                for i in offsets { modelContext.delete(expense.refunds[i]) }
+                for i in offsets { modelContext.delete(refunds[i]) }
                 try? modelContext.save()
             }
             Button {
                 let r = Refund(refundDate: .now, refundAmount: 0, reason: "Refund")
-                expense.refunds.append(r)
+                if expense.refunds == nil { expense.refunds = [] }
+                expense.refunds?.append(r)
                 try? modelContext.save()
             } label: {
                 Label("Add a refund / return / rebate", systemImage: "arrow.uturn.backward.circle")
@@ -275,12 +279,13 @@ struct ExpenseDetailView: View {
     }
 
     private var attachmentsSection: some View {
-        Section("Attachments (\(expense.attachments.count))") {
-            ForEach(expense.attachments) { attachment in
+        let attachments = expense.attachments ?? []
+        return Section("Attachments (\(attachments.count))") {
+            ForEach(attachments) { attachment in
                 AttachmentRow(attachment: attachment)
             }
             .onDelete { offsets in
-                for index in offsets { modelContext.delete(expense.attachments[index]) }
+                for index in offsets { modelContext.delete(attachments[index]) }
                 try? modelContext.save()
             }
             Button {
@@ -291,7 +296,8 @@ struct ExpenseDetailView: View {
             .sheet(isPresented: $showAddProof) {
                 ProofOfPaymentPickerSheet { data, mime, type in
                     let attachment = Attachment(type: type, mimeType: mime, fileData: data)
-                    expense.attachments.append(attachment)
+                    if expense.attachments == nil { expense.attachments = [] }
+                    expense.attachments?.append(attachment)
                     var cl = expense.readinessChecklist
                     if type == .proofOfPayment { cl.proofOfPayment = true }
                     if type == .educationalBenefitForm { cl.educationalBenefitForm = true }
@@ -303,11 +309,12 @@ struct ExpenseDetailView: View {
     }
 
     private var lineItemsSection: some View {
-        Section("Line items (\(expense.lineItems.count))") {
-            if expense.lineItems.isEmpty {
+        let lineItems = expense.lineItems ?? []
+        return Section("Line items (\(lineItems.count))") {
+            if lineItems.isEmpty {
                 Text("No line items extracted.").foregroundStyle(.secondary)
             } else {
-                ForEach(expense.lineItems) { item in
+                ForEach(lineItems) { item in
                     HStack {
                         Text(item.descriptionText)
                         Spacer()
@@ -384,7 +391,7 @@ struct ExpenseDetailView: View {
         )
         let input = EligibilityInput(
             categoryKey: expense.categoryKey,
-            descriptionText: ([expense.vendorName] + expense.lineItems.map { $0.descriptionText } + [expense.notes]).joined(separator: " "),
+            descriptionText: ([expense.vendorName] + (expense.lineItems ?? []).map { $0.descriptionText } + [expense.notes]).joined(separator: " "),
             amount: expense.total,
             program: student.program,
             acquisitionPath: expense.acquisitionPath,

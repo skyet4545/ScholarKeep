@@ -73,8 +73,9 @@ struct ClaimDetailView: View {
     }
 
     private var expensesSection: some View {
-        Section("Expenses (\(claim.expenses.count))") {
-            ForEach(claim.expenses) { expense in
+        let claimExpenses = claim.expenses ?? []
+        return Section("Expenses (\(claimExpenses.count))") {
+            ForEach(claimExpenses) { expense in
                 NavigationLink {
                     ExpenseDetailView(expense: expense)
                 } label: {
@@ -112,11 +113,12 @@ struct ClaimDetailView: View {
     }
 
     private var timelineSection: some View {
-        Section("Timeline") {
-            if claim.statusEvents.isEmpty {
+        let events = claim.statusEvents ?? []
+        return Section("Timeline") {
+            if events.isEmpty {
                 Text("No status events yet.").foregroundStyle(.secondary)
             } else {
-                ForEach(claim.statusEvents.sorted(by: { $0.date < $1.date })) { event in
+                ForEach(events.sorted(by: { $0.date < $1.date })) { event in
                     HStack(alignment: .top, spacing: 10) {
                         Image(systemName: event.status.systemImageName)
                             .foregroundStyle(.tint)
@@ -185,7 +187,7 @@ struct ClaimDetailView: View {
     }
 
     private var totalAmount: Decimal {
-        claim.expenses.reduce(Decimal(0)) { $0 + $1.total }
+        (claim.expenses ?? []).reduce(Decimal(0)) { $0 + $1.total }
     }
 
     private func decimalField(_ label: String, binding: Binding<String>) -> some View {
@@ -216,7 +218,7 @@ struct ClaimDetailView: View {
     /// Mirror denial reasons onto the readiness checklist so the parent sees exactly what to fix.
     private func applyDenialFix(_ reason: DenialReason) {
         guard let field = reason.checklistKey else { return }
-        for expense in claim.expenses {
+        for expense in (claim.expenses ?? []) {
             var cl = expense.readinessChecklist
             switch field {
             case .itemizedReceipt:           cl.itemizedReceipt = false

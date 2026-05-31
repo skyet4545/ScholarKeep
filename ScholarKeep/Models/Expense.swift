@@ -25,7 +25,7 @@ final class Expense {
     /// PaidInFull flag for theme-park-style claims.
     var paidInFull: Bool = true
     /// Total refund amount applied (derived from refunds[]).
-    var refundedAmount: Decimal { refunds.reduce(0) { $0 + $1.refundAmount } }
+    var refundedAmount: Decimal { (refunds ?? []).reduce(0) { $0 + $1.refundAmount } }
     /// Net amount eligible for reimbursement after refunds.
     var netReimbursableAmount: Decimal { total - refundedAmount }
 
@@ -48,10 +48,10 @@ final class Expense {
     var student: Student?
     var provider: Provider?
     var preAuthorization: PreAuthorization?
-    @Relationship(deleteRule: .cascade, inverse: \LineItem.expense) var lineItems: [LineItem] = []
-    @Relationship(deleteRule: .cascade, inverse: \Attachment.expense) var attachments: [Attachment] = []
-    @Relationship(deleteRule: .cascade, inverse: \Refund.expense) var refunds: [Refund] = []
-    @Relationship(deleteRule: .nullify, inverse: \DevicePurchase.expense) var devicePurchases: [DevicePurchase] = []
+    @Relationship(deleteRule: .cascade, inverse: \LineItem.expense) var lineItems: [LineItem]? = []
+    @Relationship(deleteRule: .cascade, inverse: \Attachment.expense) var attachments: [Attachment]? = []
+    @Relationship(deleteRule: .cascade, inverse: \Refund.expense) var refunds: [Refund]? = []
+    @Relationship(deleteRule: .nullify, inverse: \DevicePurchase.expense) var devicePurchases: [DevicePurchase]? = []
     var claim: Claim?
 
     init(

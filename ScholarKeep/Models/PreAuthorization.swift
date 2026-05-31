@@ -48,7 +48,7 @@ final class PreAuthorization {
     var createdAt: Date = Date.now
 
     var student: Student?
-    @Relationship(deleteRule: .nullify, inverse: \Expense.preAuthorization) var expenses: [Expense] = []
+    @Relationship(deleteRule: .nullify, inverse: \Expense.preAuthorization) var expenses: [Expense]? = []
 
     init(
         id: UUID = UUID(),

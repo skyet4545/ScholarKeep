@@ -402,14 +402,14 @@ struct OnboardingFlow: View {
                         disabled: false
                     )
                     HStack(alignment: .top, spacing: DS.base) {
-                        Image(systemName: "icloud")
+                        Image(systemName: "icloud.fill")
                             .font(.title3)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(DS.statusGood)
                             .frame(width: 28)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("iCloud backup")
+                            Text("iCloud sync is on")
                                 .font(.body.weight(.semibold))
-                            Text("Coming in v0.7. For now your records live entirely on this device.")
+                            Text("Your records sync automatically across every iPhone and iPad on your Apple ID.")
                                 .font(.footnote).foregroundStyle(.secondary)
                         }
                         Spacer()

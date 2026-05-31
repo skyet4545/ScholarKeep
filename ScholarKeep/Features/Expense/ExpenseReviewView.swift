@@ -250,7 +250,8 @@ struct ExpenseReviewView: View {
                     fileData: data,
                     ocrText: idx == 0 ? rawOCRText : ""
                 )
-                expense.attachments.append(attachment)
+                if expense.attachments == nil { expense.attachments = [] }
+                expense.attachments?.append(attachment)
             }
         }
 
@@ -258,7 +259,8 @@ struct ExpenseReviewView: View {
         for draft in lineItemDrafts {
             let amount = DecimalParsing.parse(draft.amount) ?? 0
             guard !draft.description.trimmingCharacters(in: .whitespaces).isEmpty else { continue }
-            expense.lineItems.append(LineItem(descriptionText: draft.description, unitPrice: amount, amount: amount))
+            if expense.lineItems == nil { expense.lineItems = [] }
+            expense.lineItems?.append(LineItem(descriptionText: draft.description, unitPrice: amount, amount: amount))
         }
 
         modelContext.insert(expense)

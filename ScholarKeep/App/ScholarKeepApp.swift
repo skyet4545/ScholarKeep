@@ -44,20 +44,17 @@ struct ScholarKeepApp: App {
             BalanceEntry.self,
             RecurringTask.self
         ])
-        // v0.7.0 prep: model declarations are now CloudKit-compatible
-        // (all properties have default values, all relationships have
-        // inverses). The remaining blocker for enabling CloudKit is making
-        // every to-many array optional [Type]? — which cascades into 60+
-        // call sites that read `expenses.count` / `expenses.first`. Doing
-        // that refactor + testing two-device sync correctly = its own
-        // dedicated build (v0.7.1). For now, ship the foundation work and
-        // keep cloudKitDatabase: .none so existing local data continues to
-        // work without any sync behaviour.
+        // v0.7.1: CloudKit sync via the private database. SwiftData syncs
+        // automatically when the device is signed in to iCloud. If not
+        // signed in, the store behaves as a pure local store — no errors.
+        // Tests use in-memory + no CloudKit.
+        let cloudKitDatabase: ModelConfiguration.CloudKitDatabase =
+            isUITest ? .none : .private("iCloud.com.carlosreyes.scholarkeep")
         let configuration = ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: isUITest,
             allowsSave: true,
-            cloudKitDatabase: .none
+            cloudKitDatabase: cloudKitDatabase
         )
         do {
             self.modelContainer = try ModelContainer(for: schema, configurations: [configuration])

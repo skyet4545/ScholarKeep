@@ -358,6 +358,6 @@ struct EligibilityEngine {
 enum DeviceWindowChecker {
     static func studentHasRecentDevice(student: Student, within years: Int, asOf: Date = .now) -> Bool {
         guard let cutoff = Calendar.current.date(byAdding: .year, value: -years, to: asOf) else { return false }
-        return student.devicePurchases.contains { $0.purchaseDate >= cutoff }
+        return (student.devicePurchases ?? []).contains { $0.purchaseDate >= cutoff }
     }
 }

@@ -521,7 +521,7 @@ private struct ActivityItem: Identifiable {
         self.id = claim.id
         self.date = claim.paidDate ?? claim.submittedDate ?? claim.createdAt
         self.title = claim.title.isEmpty ? "Claim" : claim.title
-        let total = claim.expenses.reduce(Decimal(0)) { $0 + $1.total }
+        let total = (claim.expenses ?? []).reduce(Decimal(0)) { $0 + $1.total }
         let amount = total.formatted(.currency(code: "USD"))
         switch claim.status {
         case .draft:

@@ -30,20 +30,20 @@ struct SettingsView: View {
                 privacySection
                 Section {
                     HStack(alignment: .top, spacing: 12) {
-                        Image(systemName: "icloud")
+                        Image(systemName: "icloud.fill")
                             .font(.title3)
-                            .foregroundStyle(.secondary)
+                            .foregroundStyle(DS.statusGood)
                             .frame(width: 28)
                         VStack(alignment: .leading, spacing: 4) {
-                            Text("iCloud backup")
+                            Text("iCloud sync is on")
                                 .font(.body.weight(.semibold))
-                            Text("Coming in v0.7. Right now ScholarKeep lives entirely on this device — if you switch phones or delete the app, you'll start fresh. Real CloudKit sync is the next thing we're shipping.")
+                            Text("Your students, receipts, claims, and attachments sync automatically across every iPhone and iPad signed in to your Apple ID. Encrypted end-to-end via your iCloud account — we never see it.")
                                 .font(.footnote)
                                 .foregroundStyle(.secondary)
                         }
                     }
                 } header: { Text("Backup") } footer: {
-                    Text("Local-first by default. No third-party analytics or trackers — ever.")
+                    Text("Local-first. No third-party analytics. Sync uses Apple's CloudKit — your data stays in your iCloud account, not ours.")
                 }
                 notificationsSection
                 rulesetSection

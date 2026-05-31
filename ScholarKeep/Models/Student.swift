@@ -20,13 +20,15 @@ final class Student {
     /// this date are permanently ineligible under PEP — no appeals.
     var slpApprovedDate: Date?
 
-    @Relationship(deleteRule: .cascade, inverse: \Expense.student) var expenses: [Expense] = []
-    @Relationship(deleteRule: .cascade, inverse: \Claim.student) var claims: [Claim] = []
-    @Relationship(deleteRule: .cascade, inverse: \DevicePurchase.student) var devicePurchases: [DevicePurchase] = []
-    @Relationship(deleteRule: .cascade, inverse: \Provider.student) var providers: [Provider] = []
-    @Relationship(deleteRule: .cascade, inverse: \PreAuthorization.student) var preAuthorizations: [PreAuthorization] = []
-    @Relationship(deleteRule: .cascade, inverse: \BalanceEntry.student) var balanceEntries: [BalanceEntry] = []
-    @Relationship(deleteRule: .cascade, inverse: \RecurringTask.student) var recurringTasks: [RecurringTask] = []
+    // CloudKit requires to-many relationships to be optional. SwiftData
+    // returns nil between sync events; callers should treat nil as [].
+    @Relationship(deleteRule: .cascade, inverse: \Expense.student) var expenses: [Expense]? = []
+    @Relationship(deleteRule: .cascade, inverse: \Claim.student) var claims: [Claim]? = []
+    @Relationship(deleteRule: .cascade, inverse: \DevicePurchase.student) var devicePurchases: [DevicePurchase]? = []
+    @Relationship(deleteRule: .cascade, inverse: \Provider.student) var providers: [Provider]? = []
+    @Relationship(deleteRule: .cascade, inverse: \PreAuthorization.student) var preAuthorizations: [PreAuthorization]? = []
+    @Relationship(deleteRule: .cascade, inverse: \BalanceEntry.student) var balanceEntries: [BalanceEntry]? = []
+    @Relationship(deleteRule: .cascade, inverse: \RecurringTask.student) var recurringTasks: [RecurringTask]? = []
 
     init(
         id: UUID = UUID(),

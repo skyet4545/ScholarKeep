@@ -52,8 +52,9 @@ final class ExpenseReadinessTests: XCTestCase {
         let e = Expense(total: 100)
         let r1 = Refund(refundDate: .now, refundAmount: 25, reason: "Returned book")
         let r2 = Refund(refundDate: .now, refundAmount: 10, reason: "Manufacturer rebate")
-        e.refunds.append(r1)
-        e.refunds.append(r2)
+        if e.refunds == nil { e.refunds = [] }
+        e.refunds?.append(r1)
+        e.refunds?.append(r2)
         XCTAssertEqual(e.refundedAmount, 35)
         XCTAssertEqual(e.netReimbursableAmount, 65)
     }

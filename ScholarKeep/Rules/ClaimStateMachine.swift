@@ -48,7 +48,7 @@ enum ClaimStateMachine {
             throw TransitionError.notAllowed(from: claim.status, to: next)
         }
         if next == .readyToSubmit {
-            for expense in claim.expenses where !expense.isFullyReadyForSubmit {
+            for expense in (claim.expenses ?? []) where !expense.isFullyReadyForSubmit {
                 throw TransitionError.checklistIncomplete
             }
         }
@@ -74,7 +74,8 @@ enum ClaimStateMachine {
         }
 
         let event = StatusEvent(status: next, date: date, note: note, claim: claim)
-        claim.statusEvents.append(event)
+        if claim.statusEvents == nil { claim.statusEvents = [] }
+        claim.statusEvents?.append(event)
         return event
     }
 

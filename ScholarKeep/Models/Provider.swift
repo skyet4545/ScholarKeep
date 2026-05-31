@@ -17,7 +17,7 @@ final class Provider {
     var notes: String = ""
     var createdAt: Date = Date.now
     var student: Student?
-    @Relationship(deleteRule: .nullify, inverse: \Expense.provider) var expenses: [Expense] = []
+    @Relationship(deleteRule: .nullify, inverse: \Expense.provider) var expenses: [Expense]? = []
 
     init(
         id: UUID = UUID(),

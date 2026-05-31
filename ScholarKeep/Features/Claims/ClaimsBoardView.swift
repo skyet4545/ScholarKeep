@@ -119,7 +119,7 @@ private struct ClaimRow: View {
                     .foregroundStyle(Color.accentColor)
             }
             HStack(spacing: 12) {
-                Label("\(claim.expenses.count)", systemImage: "doc.text")
+                Label("\((claim.expenses ?? []).count)", systemImage: "doc.text")
                 Label(totalAmount.formatted(.currency(code: "USD")), systemImage: "dollarsign")
                 if let submitted = claim.submittedDate {
                     Label(submitted.formatted(date: .abbreviated, time: .omitted), systemImage: "paperplane")
@@ -132,6 +132,6 @@ private struct ClaimRow: View {
     }
 
     private var totalAmount: Decimal {
-        claim.expenses.reduce(Decimal(0)) { $0 + $1.total }
+        (claim.expenses ?? []).reduce(Decimal(0)) { $0 + $1.total }
     }
 }

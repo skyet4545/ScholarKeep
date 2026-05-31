@@ -18,7 +18,7 @@ final class ClaimStateMachineTests: XCTestCase {
         _ = try ClaimStateMachine.transition(claim, to: .paidReimbursed)
         XCTAssertNotNil(claim.paidDate)
         XCTAssertEqual(claim.status, .paidReimbursed)
-        XCTAssertEqual(claim.statusEvents.count, 5)
+        XCTAssertEqual((claim.statusEvents ?? []).count, 5)
     }
 
     func testReadyToSubmitGatedByChecklist() {
@@ -82,12 +82,13 @@ final class ClaimStateMachineTests: XCTestCase {
         let claim = Claim(title: "Test claim", status: status)
         let expense = Expense(vendorName: "Test vendor", total: 100)
         expense.claim = claim
-        claim.expenses.append(expense)
+        if claim.expenses == nil { claim.expenses = [] }
+        claim.expenses?.append(expense)
         return claim
     }
 
     private func markExpensesReady(_ claim: Claim) {
-        for e in claim.expenses {
+        for e in (claim.expenses ?? []) {
             var cl = e.readinessChecklist
             cl.itemizedReceipt = true
             cl.proofOfPayment = true
