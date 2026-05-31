@@ -11,10 +11,15 @@ struct PaywallView: View {
         NavigationStack {
             ScrollView {
                 VStack(spacing: 24) {
+                    if subs.isBetaFounder {
+                        betaFounderCard
+                    }
                     header
                     benefitsList
-                    productCards
-                    restoreRow
+                    if !subs.isBetaFounder {
+                        productCards
+                        restoreRow
+                    }
                     footnote
                 }
                 .padding(20)
@@ -23,7 +28,7 @@ struct PaywallView: View {
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .cancellationAction) {
-                    Button("Not now") { dismiss() }
+                    Button(subs.isBetaFounder ? "Done" : "Not now") { dismiss() }
                 }
             }
             .task {
@@ -31,6 +36,24 @@ struct PaywallView: View {
                 await subs.refreshEntitlements()
             }
         }
+    }
+
+    private var betaFounderCard: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 10) {
+                Image(systemName: "star.circle.fill")
+                    .font(.title2)
+                    .foregroundStyle(.tint)
+                Text("You're a Beta Founder")
+                    .font(.headline)
+            }
+            Text("You already have every Pro feature, free, forever — our thanks for trying ScholarKeep before public launch.")
+                .font(.subheadline)
+                .foregroundStyle(.secondary)
+        }
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.accentColor.opacity(0.12), in: RoundedRectangle(cornerRadius: 16))
     }
 
     private var header: some View {
@@ -120,9 +143,14 @@ struct PaywallView: View {
                 Text(product.displayPrice + (isYearly ? " / year" : " / month"))
                     .font(.title3.bold().monospacedDigit())
                 if let intro = product.subscription?.introductoryOffer, intro.paymentMode == .freeTrial {
-                    Text("7-day free trial")
-                        .font(.caption)
-                        .foregroundStyle(.secondary)
+                    VStack(alignment: .leading, spacing: 2) {
+                        Text(introTrialLabel(intro))
+                            .font(.caption.weight(.semibold))
+                            .foregroundStyle(DS.statusGood)
+                        Text("Then \(product.displayPrice)\(isYearly ? "/year" : "/month") — cancel anytime in Settings before the trial ends.")
+                            .font(.caption2)
+                            .foregroundStyle(.secondary)
+                    }
                 }
                 Text(product.description)
                     .font(.caption)
@@ -144,6 +172,22 @@ struct PaywallView: View {
                 ProgressView()
             }
         }
+    }
+
+    /// Convert a StoreKit intro period into mom-friendly copy like
+    /// "30-day free trial" or "1-month free trial" regardless of what we
+    /// later configure in App Store Connect.
+    private func introTrialLabel(_ intro: Product.SubscriptionOffer) -> String {
+        let n = intro.period.value
+        let unit: String
+        switch intro.period.unit {
+        case .day:   unit = "day"
+        case .week:  unit = "week"
+        case .month: unit = "month"
+        case .year:  unit = "year"
+        @unknown default: unit = "day"
+        }
+        return "\(n)-\(unit)\(n == 1 ? "" : "s") free trial"
     }
 
     private var restoreRow: some View {

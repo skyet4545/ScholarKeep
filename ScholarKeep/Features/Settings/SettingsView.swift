@@ -94,10 +94,25 @@ struct SettingsView: View {
     }
 
     private var subscriptionSection: some View {
-        Section("Subscription") {
-            if subs.isPro {
+        Section {
+            if subs.isBetaFounder {
+                HStack(alignment: .top, spacing: 12) {
+                    Image(systemName: "star.circle.fill")
+                        .font(.title3)
+                        .foregroundStyle(DS.accent)
+                        .frame(width: 28)
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text("Beta Founder · Pro for life")
+                            .font(.body.weight(.semibold))
+                            .foregroundStyle(DS.accent)
+                        Text("Thanks for trying ScholarKeep before public launch. You have every Pro feature, free, forever — our way of saying thanks for helping us build this.")
+                            .font(.footnote)
+                            .foregroundStyle(.secondary)
+                    }
+                }
+            } else if subs.hasStoreKitPro {
                 Label("Pro is active", systemImage: "checkmark.seal.fill")
-                    .foregroundStyle(.green)
+                    .foregroundStyle(DS.statusGood)
                 Link(destination: URL(string: "https://apps.apple.com/account/subscriptions")!) {
                     Label("Manage subscription", systemImage: "arrow.up.right.square")
                 }
@@ -105,9 +120,15 @@ struct SettingsView: View {
                 Button {
                     showPaywall = true
                 } label: {
-                    Label("Upgrade to Pro", systemImage: "graduationcap.fill")
+                    Label("Try Pro · 30 days free", systemImage: "graduationcap.fill")
                         .foregroundStyle(.tint)
                 }
+            }
+        } header: { Text("Subscription") } footer: {
+            if subs.isBetaFounder {
+                Text("Beta Founder status is per-install. Sign in to the same Apple ID across devices to keep it.")
+            } else {
+                EmptyView()
             }
         }
     }

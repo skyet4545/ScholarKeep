@@ -23,6 +23,9 @@ struct ScholarKeepApp: App {
         self._settings = State(initialValue: AppSettings(defaults: .standard))
         // First-party Apple crash + diagnostic capture (no third-party SDK).
         _ = CrashDiagnostics.shared
+        // Stamp first-launch date so beta testers can be granted Lifetime Pro
+        // when public launch happens.
+        BetaEntitlement.recordFirstLaunchIfNeeded()
         // Background-refresh the ruleset from the public URL. Fails silently.
         if !isUITest {
             Task.detached(priority: .background) {

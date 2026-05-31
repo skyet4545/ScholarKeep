@@ -32,8 +32,18 @@ final class SubscriptionService {
     static let shared = SubscriptionService()
 
     private(set) var products: [Product] = []
-    private(set) var isPro: Bool = false
+    /// True StoreKit entitlement — set strictly by Transaction.currentEntitlements.
+    private(set) var hasStoreKitPro: Bool = false
     private(set) var lastChecked: Date?
+
+    /// Effective Pro status: StoreKit entitlement OR beta founder status.
+    /// Use this everywhere except code that needs to differentiate
+    /// "actually purchased" vs "beta-granted."
+    var isPro: Bool { hasStoreKitPro || BetaEntitlement.isActive }
+
+    /// True if the user is a beta founder (lifetime Pro granted for free,
+    /// pre-public-launch install). Use for badges / messaging.
+    var isBetaFounder: Bool { !hasStoreKitPro && BetaEntitlement.isActive }
 
     private var transactionListener: Task<Void, Never>?
 
@@ -108,7 +118,7 @@ final class SubscriptionService {
                 }
             }
         }
-        self.isPro = hasPro
+        self.hasStoreKitPro = hasPro
         self.lastChecked = .now
     }
 
