@@ -6,22 +6,22 @@ import SwiftData
 /// parent reduce their claim amount or withdraw the claim entirely.
 @Model
 final class Refund {
-    @Attribute(.unique) var id: UUID
-    var refundDate: Date
-    var refundAmount: Decimal
-    var reason: String          // free text: "returned to store", "manufacturer rebate", etc.
-    var notes: String
+    var id: UUID = UUID()
+    var refundDate: Date = Date.now
+    var refundAmount: Decimal = 0
+    var reason: String = ""      // free text: "returned to store", "manufacturer rebate", etc.
+    var notes: String = ""
     var expense: Expense?
-    var createdAt: Date
+    var createdAt: Date = Date.now
 
     init(
         id: UUID = UUID(),
-        refundDate: Date = .now,
+        refundDate: Date = Date.now,
         refundAmount: Decimal,
         reason: String = "",
         notes: String = "",
         expense: Expense? = nil,
-        createdAt: Date = .now
+        createdAt: Date = Date.now
     ) {
         self.id = id
         self.refundDate = refundDate

@@ -43,24 +43,24 @@ enum BalanceEntryType: String, Codable, CaseIterable, Identifiable {
 /// manually because the app doesn't connect to EMA/SMP.
 @Model
 final class BalanceEntry {
-    @Attribute(.unique) var id: UUID
-    var typeRaw: String
-    var amount: Decimal             // always positive; type determines direction
-    var date: Date
-    var note: String
+    var id: UUID = UUID()
+    var typeRaw: String = BalanceEntryType.disbursement.rawValue
+    var amount: Decimal = 0          // always positive; type determines direction
+    var date: Date = Date.now
+    var note: String = ""
     var student: Student?
-    var relatedClaimID: UUID?       // if tied to a Claim
-    var createdAt: Date
+    var relatedClaimID: UUID?        // if tied to a Claim
+    var createdAt: Date = Date.now
 
     init(
         id: UUID = UUID(),
         type: BalanceEntryType,
         amount: Decimal,
-        date: Date = .now,
+        date: Date = Date.now,
         note: String = "",
         student: Student? = nil,
         relatedClaimID: UUID? = nil,
-        createdAt: Date = .now
+        createdAt: Date = Date.now
     ) {
         self.id = id
         self.typeRaw = type.rawValue

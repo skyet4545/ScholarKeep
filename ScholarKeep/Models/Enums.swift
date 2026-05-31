@@ -60,7 +60,7 @@ enum SFO: String, Codable, CaseIterable, Identifiable {
 enum SchoolYear {
     /// Returns the school year label (e.g. "2026-27") that contains the given date,
     /// where a school year runs July 1 – June 30.
-    static func label(for date: Date = .now, calendar: Calendar = .current) -> String {
+    static func label(for date: Date = Date.now, calendar: Calendar = .current) -> String {
         let components = calendar.dateComponents([.year, .month], from: date)
         guard let year = components.year, let month = components.month else { return "" }
         let startYear = month >= 7 ? year : year - 1

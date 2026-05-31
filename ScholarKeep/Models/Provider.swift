@@ -6,17 +6,18 @@ import SwiftData
 /// and so the app can surface "missing license #" warnings consistently.
 @Model
 final class Provider {
-    @Attribute(.unique) var id: UUID
-    var name: String
-    var typeRaw: String
-    var licenseNumber: String
-    var licenseType: String      // e.g. "BCBA", "SLP", "Florida Educator's Certificate"
-    var licenseState: String     // "FL", "TX", etc.
-    var isFloridaCertifiedTeacher: Bool
-    var deliversVirtually: Bool  // out-of-state OK if virtual + credentialed
-    var notes: String
-    var createdAt: Date
+    var id: UUID = UUID()
+    var name: String = ""
+    var typeRaw: String = ProviderType.other.rawValue
+    var licenseNumber: String = ""
+    var licenseType: String = ""      // e.g. "BCBA", "SLP", "Florida Educator's Certificate"
+    var licenseState: String = "FL"   // "FL", "TX", etc.
+    var isFloridaCertifiedTeacher: Bool = false
+    var deliversVirtually: Bool = false  // out-of-state OK if virtual + credentialed
+    var notes: String = ""
+    var createdAt: Date = Date.now
     var student: Student?
+    @Relationship(deleteRule: .nullify, inverse: \Expense.provider) var expenses: [Expense] = []
 
     init(
         id: UUID = UUID(),
@@ -28,7 +29,7 @@ final class Provider {
         isFloridaCertifiedTeacher: Bool = false,
         deliversVirtually: Bool = false,
         notes: String = "",
-        createdAt: Date = .now,
+        createdAt: Date = Date.now,
         student: Student? = nil
     ) {
         self.id = id

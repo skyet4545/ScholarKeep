@@ -92,14 +92,14 @@ enum RecurringTaskTemplate: String, CaseIterable, Identifiable {
 /// for the next due date.
 @Model
 final class RecurringTask {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var notes: String
-    var scheduleRaw: String
-    var nextDueDate: Date
+    var id: UUID = UUID()
+    var title: String = ""
+    var notes: String = ""
+    var scheduleRaw: String = RecurringSchedule.monthly.rawValue
+    var nextDueDate: Date = Date.now
     var lastCompletedDate: Date?
-    var isArchived: Bool
-    var createdAt: Date
+    var isArchived: Bool = false
+    var createdAt: Date = Date.now
     var student: Student?
 
     init(
@@ -110,7 +110,7 @@ final class RecurringTask {
         nextDueDate: Date,
         lastCompletedDate: Date? = nil,
         isArchived: Bool = false,
-        createdAt: Date = .now,
+        createdAt: Date = Date.now,
         student: Student? = nil
     ) {
         self.id = id
@@ -136,7 +136,7 @@ final class RecurringTask {
 
     /// Marks the task complete and advances nextDueDate by one schedule period.
     /// For one-time tasks, archives instead.
-    func markComplete(asOf date: Date = .now) {
+    func markComplete(asOf date: Date = Date.now) {
         lastCompletedDate = date
         if let next = schedule.next(from: nextDueDate) {
             nextDueDate = next

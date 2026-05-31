@@ -3,9 +3,9 @@ import SwiftData
 
 @Model
 final class Claim {
-    @Attribute(.unique) var id: UUID
-    var title: String
-    var statusRaw: String
+    var id: UUID = UUID()
+    var title: String = ""
+    var statusRaw: String = ClaimStatus.draft.rawValue
     var submittedDate: Date?
     var decisionDate: Date?
     var paidDate: Date?
@@ -16,14 +16,14 @@ final class Claim {
     var actualPayout: Decimal?
 
     var denialReasonRaw: String?
-    var denialNote: String
-    var appealNote: String
+    var denialNote: String = ""
+    var appealNote: String = ""
 
-    var createdAt: Date
+    var createdAt: Date = Date.now
 
     var student: Student?
-    @Relationship(deleteRule: .nullify, inverse: \Expense.claim) var expenses: [Expense]
-    @Relationship(deleteRule: .cascade, inverse: \StatusEvent.claim) var statusEvents: [StatusEvent]
+    @Relationship(deleteRule: .nullify, inverse: \Expense.claim) var expenses: [Expense] = []
+    @Relationship(deleteRule: .cascade, inverse: \StatusEvent.claim) var statusEvents: [StatusEvent] = []
 
     init(
         id: UUID = UUID(),
@@ -39,7 +39,7 @@ final class Claim {
         denialReason: DenialReason? = nil,
         denialNote: String = "",
         appealNote: String = "",
-        createdAt: Date = .now,
+        createdAt: Date = Date.now,
         student: Student? = nil,
         expenses: [Expense] = [],
         statusEvents: [StatusEvent] = []

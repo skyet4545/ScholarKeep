@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class DevicePurchase {
-    @Attribute(.unique) var id: UUID
-    var deviceType: String
-    var purchaseDate: Date
-    var amount: Decimal
-    var notes: String
+    var id: UUID = UUID()
+    var deviceType: String = ""
+    var purchaseDate: Date = Date.now
+    var amount: Decimal = 0
+    var notes: String = ""
     var student: Student?
     var expense: Expense?
 

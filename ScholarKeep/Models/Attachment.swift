@@ -3,12 +3,12 @@ import SwiftData
 
 @Model
 final class Attachment {
-    @Attribute(.unique) var id: UUID
-    var typeRaw: String
-    var mimeType: String
+    var id: UUID = UUID()
+    var typeRaw: String = AttachmentType.other.rawValue
+    var mimeType: String = ""
     @Attribute(.externalStorage) var fileData: Data?
-    var ocrText: String
-    var createdAt: Date
+    var ocrText: String = ""
+    var createdAt: Date = Date.now
     var expense: Expense?
 
     init(
@@ -17,7 +17,7 @@ final class Attachment {
         mimeType: String,
         fileData: Data? = nil,
         ocrText: String = "",
-        createdAt: Date = .now,
+        createdAt: Date = Date.now,
         expense: Expense? = nil
     ) {
         self.id = id

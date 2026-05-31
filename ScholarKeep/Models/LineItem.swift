@@ -3,11 +3,11 @@ import SwiftData
 
 @Model
 final class LineItem {
-    @Attribute(.unique) var id: UUID
-    var descriptionText: String
-    var quantity: Int
-    var unitPrice: Decimal
-    var amount: Decimal
+    var id: UUID = UUID()
+    var descriptionText: String = ""
+    var quantity: Int = 1
+    var unitPrice: Decimal = 0
+    var amount: Decimal = 0
     var eligibilityFlagRaw: String?
     var matchedRuleKey: String?
     var expense: Expense?

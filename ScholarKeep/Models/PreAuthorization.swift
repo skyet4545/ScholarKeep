@@ -33,22 +33,22 @@ enum PreAuthStatus: String, Codable, CaseIterable, Identifiable {
 /// Not all expenses need one — only those flagged by the eligibility engine.
 @Model
 final class PreAuthorization {
-    @Attribute(.unique) var id: UUID
-    var statusRaw: String
+    var id: UUID = UUID()
+    var statusRaw: String = PreAuthStatus.draft.rawValue
     var requestedDate: Date?
     var approvedDate: Date?
     var deniedDate: Date?
-    var approvedNumber: String        // the number issued by the SFO
-    var expirationDate: Date?         // typically end of school year
-    var itemDescription: String       // what the parent plans to buy
+    var approvedNumber: String = ""        // the number issued by the SFO
+    var expirationDate: Date?              // typically end of school year
+    var itemDescription: String = ""       // what the parent plans to buy
     var estimatedAmount: Decimal?
-    var categoryKey: String?          // RuleCategory key
-    var notes: String                 // free text for the parent's own records
-    var sfoResponseNote: String       // what the SFO said (denial reason or extra info)
-    var createdAt: Date
+    var categoryKey: String?               // RuleCategory key
+    var notes: String = ""                 // free text for the parent's own records
+    var sfoResponseNote: String = ""       // what the SFO said (denial reason or extra info)
+    var createdAt: Date = Date.now
 
     var student: Student?
-    @Relationship(deleteRule: .nullify, inverse: \Expense.preAuthorization) var expenses: [Expense]
+    @Relationship(deleteRule: .nullify, inverse: \Expense.preAuthorization) var expenses: [Expense] = []
 
     init(
         id: UUID = UUID(),
@@ -63,7 +63,7 @@ final class PreAuthorization {
         categoryKey: String? = nil,
         notes: String = "",
         sfoResponseNote: String = "",
-        createdAt: Date = .now,
+        createdAt: Date = Date.now,
         student: Student? = nil,
         expenses: [Expense] = []
     ) {

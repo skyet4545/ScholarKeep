@@ -3,16 +3,16 @@ import SwiftData
 
 @Model
 final class StatusEvent {
-    @Attribute(.unique) var id: UUID
-    var statusRaw: String
-    var date: Date
-    var note: String
+    var id: UUID = UUID()
+    var statusRaw: String = ClaimStatus.draft.rawValue
+    var date: Date = Date.now
+    var note: String = ""
     var claim: Claim?
 
     init(
         id: UUID = UUID(),
         status: ClaimStatus,
-        date: Date = .now,
+        date: Date = Date.now,
         note: String = "",
         claim: Claim? = nil
     ) {

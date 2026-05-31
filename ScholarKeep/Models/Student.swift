@@ -3,16 +3,18 @@ import SwiftData
 
 @Model
 final class Student {
-    @Attribute(.unique) var id: UUID
-    var displayName: String
-    var programRaw: String
-    var sfoRaw: String
-    var gradeLevel: String
-    var county: String
-    var schoolYear: String
+    // v0.7: dropped @Attribute(.unique) — CloudKit can't enforce. UUIDs are
+    // unique by nature so behaviourally equivalent.
+    var id: UUID = UUID()
+    var displayName: String = ""
+    var programRaw: String = Program.fesUA.rawValue
+    var sfoRaw: String = SFO.stepUp.rawValue
+    var gradeLevel: String = ""
+    var county: String = ""
+    var schoolYear: String = ""
     var awardAmount: Decimal?
-    var notes: String
-    var createdAt: Date
+    var notes: String = ""
+    var createdAt: Date = Date.now
 
     /// PEP-only: date the Student Learning Plan was approved. Purchases before
     /// this date are permanently ineligible under PEP — no appeals.
@@ -37,7 +39,7 @@ final class Student {
         awardAmount: Decimal? = nil,
         notes: String = "",
         slpApprovedDate: Date? = nil,
-        createdAt: Date = .now
+        createdAt: Date = Date.now
     ) {
         self.id = id
         self.displayName = displayName

@@ -3,60 +3,61 @@ import SwiftData
 
 @Model
 final class Expense {
-    @Attribute(.unique) var id: UUID
-    var vendorName: String
-    var purchaseDate: Date
-    var subtotal: Decimal
-    var tax: Decimal
-    var shipping: Decimal
-    var total: Decimal
-    var currency: String
+    var id: UUID = UUID()
+    var vendorName: String = ""
+    var purchaseDate: Date = Date.now
+    var subtotal: Decimal = 0
+    var tax: Decimal = 0
+    var shipping: Decimal = 0
+    var total: Decimal = 0
+    var currency: String = "USD"
 
     var categoryKey: String?
-    var subcategory: String
-    var paymentMethodRaw: String
-    var acquisitionPathRaw: String
+    var subcategory: String = ""
+    var paymentMethodRaw: String = ""
+    var acquisitionPathRaw: String = ""
 
     // NEW v0.2 fields
     /// Last 4 digits of the card used (most-cited PoP denial reason).
     var cardLast4: String?
     /// Parent confirmed no insurance/HSA/School Readiness paid any portion.
-    var noDoubleDipConfirmed: Bool
+    var noDoubleDipConfirmed: Bool = false
     /// PaidInFull flag for theme-park-style claims.
-    var paidInFull: Bool
+    var paidInFull: Bool = true
     /// Total refund amount applied (derived from refunds[]).
     var refundedAmount: Decimal { refunds.reduce(0) { $0 + $1.refundAmount } }
     /// Net amount eligible for reimbursement after refunds.
     var netReimbursableAmount: Decimal { total - refundedAmount }
 
     var eligibilityResultRaw: String?
-    var eligibilityReason: String
-    var eligibilityReasonsList: [String]
-    var matchedRuleKeys: [String]
+    var eligibilityReason: String = ""
+    var eligibilityReasonsList: [String] = []
+    var matchedRuleKeys: [String] = []
     var eligibilityCheckedAt: Date?
     var rulesetVersion: String?
 
-    var educationalBenefitNote: String
-    var requiresPreAuth: Bool
+    var educationalBenefitNote: String = ""
+    var requiresPreAuth: Bool = false
     var preAuthNumber: String?
 
     var readinessChecklistData: Data?
 
-    var notes: String
-    var createdAt: Date
+    var notes: String = ""
+    var createdAt: Date = Date.now
 
     var student: Student?
     var provider: Provider?
     var preAuthorization: PreAuthorization?
-    @Relationship(deleteRule: .cascade, inverse: \LineItem.expense) var lineItems: [LineItem]
-    @Relationship(deleteRule: .cascade, inverse: \Attachment.expense) var attachments: [Attachment]
-    @Relationship(deleteRule: .cascade, inverse: \Refund.expense) var refunds: [Refund]
+    @Relationship(deleteRule: .cascade, inverse: \LineItem.expense) var lineItems: [LineItem] = []
+    @Relationship(deleteRule: .cascade, inverse: \Attachment.expense) var attachments: [Attachment] = []
+    @Relationship(deleteRule: .cascade, inverse: \Refund.expense) var refunds: [Refund] = []
+    @Relationship(deleteRule: .nullify, inverse: \DevicePurchase.expense) var devicePurchases: [DevicePurchase] = []
     var claim: Claim?
 
     init(
         id: UUID = UUID(),
         vendorName: String = "",
-        purchaseDate: Date = .now,
+        purchaseDate: Date = Date.now,
         subtotal: Decimal = 0,
         tax: Decimal = 0,
         shipping: Decimal = 0,
@@ -80,7 +81,7 @@ final class Expense {
         preAuthNumber: String? = nil,
         readinessChecklist: ReadinessChecklist = ReadinessChecklist(),
         notes: String = "",
-        createdAt: Date = .now,
+        createdAt: Date = Date.now,
         student: Student? = nil,
         provider: Provider? = nil,
         preAuthorization: PreAuthorization? = nil,
