@@ -79,9 +79,9 @@ struct PaywallView: View {
             benefit("CSV export for taxes and records",
                     "Every expense, every refund, every status — exportable for your year-end records.",
                     "tablecells.fill")
-            benefit("iCloud backup",
-                    "Your data follows you across iPhone and iPad. Off by default, on with one tap.",
-                    "icloud.fill")
+            benefit("Family Sharing",
+                    "One subscription covers your whole household — up to six family members, not per child.",
+                    "person.2.fill")
             benefit("Year-end summary report",
                     "Full breakdown by program, category, and claim status — ready before the July 31 deadline.",
                     "chart.line.uptrend.xyaxis")
