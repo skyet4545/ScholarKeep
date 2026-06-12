@@ -9,15 +9,18 @@ struct ScholarKeepApp: App {
     init() {
         // UI-test entry point: --reset wipes UserDefaults and uses an in-memory store
         // so every test starts at a known onboarding state.
-        let isUITest = CommandLine.arguments.contains("--reset")
+        // --demo also forces in-memory and seeds sample data (App Store screenshots,
+        // FPEA booth demos) so demo data never touches real records.
+        let isDemo = DemoSeed.isActive
+        let isUITest = CommandLine.arguments.contains("--reset") || isDemo
         let isScreenshot = CommandLine.arguments.contains("--screenshot")
         if isUITest {
             if let domain = Bundle.main.bundleIdentifier {
                 UserDefaults.standard.removePersistentDomain(forName: domain)
             }
         }
-        // Screenshot mode: pre-populate onboarding so capture lands directly on the app.
-        if isScreenshot {
+        // Screenshot/demo mode: pre-populate onboarding so capture lands directly in the app.
+        if isScreenshot || isDemo {
             UserDefaults.standard.set(true, forKey: "hasCompletedOnboarding")
         }
         self._settings = State(initialValue: AppSettings(defaults: .standard))
@@ -61,6 +64,9 @@ struct ScholarKeepApp: App {
         )
         do {
             self.modelContainer = try ModelContainer(for: schema, configurations: [configuration])
+            if isDemo {
+                DemoSeed.seed(into: ModelContext(self.modelContainer), settings: self._settings.wrappedValue)
+            }
         } catch {
             // Fall back to in-memory so the app doesn't crash on schema mismatch.
             self.modelContainer = try! ModelContainer(

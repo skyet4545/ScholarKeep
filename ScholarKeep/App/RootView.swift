@@ -61,21 +61,38 @@ struct MainTabView: View {
         CommandLine.arguments.contains("--devtools")
     }
 
+    enum Tab: String { case home, check, claims, more }
+
+    /// `--tab check` etc. launches directly on a tab — used by the screenshot
+    /// pipeline so each capture is one CLI relaunch, no UI automation.
+    @State private var selection: Tab = {
+        if let idx = CommandLine.arguments.firstIndex(of: "--tab"),
+           CommandLine.arguments.indices.contains(idx + 1),
+           let tab = Tab(rawValue: CommandLine.arguments[idx + 1]) {
+            return tab
+        }
+        return .home
+    }()
+
     var body: some View {
         // v0.5.0: 4 clean tabs (no FAB — Jony Ive principle).
         // Expenses list moves under More; primary scan action is Home's top-right "+".
-        TabView {
+        TabView(selection: $selection) {
             DashboardView()
                 .tabItem { Label("Home", systemImage: "house.fill") }
+                .tag(Tab.home)
 
             PrePurchaseCheckerView()
                 .tabItem { Label("Check", systemImage: "bubble.left.and.bubble.right.fill") }
+                .tag(Tab.check)
 
             ClaimsBoardView()
                 .tabItem { Label("Claims", systemImage: "tray.full.fill") }
+                .tag(Tab.claims)
 
             MoreMenuView()
                 .tabItem { Label("More", systemImage: "ellipsis.circle") }
+                .tag(Tab.more)
 
             if isDevTools {
                 DevOCRTesterView()

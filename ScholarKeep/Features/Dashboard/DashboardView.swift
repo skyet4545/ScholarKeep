@@ -479,14 +479,18 @@ struct DashboardView: View {
     private struct DeadlineItem { let label: String; let subline: String; let tint: Color; let daysAway: Int }
 
     private func deadlines() -> [DeadlineItem] {
-        let label = RulesetLoader.shared.schoolYearLabel
-        let parts = label.split(separator: "-")
-        guard parts.count == 2, let start = Int(parts[0]) else { return [] }
-        let endYear = start + 1
+        // Each deadline recurs annually — show the NEXT upcoming occurrence of
+        // each, not the dates tied to the ruleset's school-year label. (Keying
+        // off the label made a June 2026 user see the July 2027 cliff as
+        // "350d away" while their real July 31, 2026 deadline was 7 weeks out.)
+        let cal = Calendar.current
         func make(_ m: Int, _ d: Int, _ label: String, _ subline: String) -> DeadlineItem? {
-            var c = DateComponents(); c.year = endYear; c.month = m; c.day = d
-            guard let date = Calendar.current.date(from: c), date >= .now else { return nil }
-            let days = Calendar.current.dateComponents([.day], from: .now, to: date).day ?? 0
+            guard let next = cal.nextDate(
+                after: .now,
+                matching: DateComponents(month: m, day: d),
+                matchingPolicy: .nextTime
+            ) else { return nil }
+            let days = cal.dateComponents([.day], from: .now, to: next).day ?? 0
             let tint: Color
             switch days {
             case ..<7:  tint = DS.statusBad
@@ -499,7 +503,9 @@ struct DashboardView: View {
             make(5, 29, "Pre-auth cutoff", "May 29 — last day to submit"),
             make(6, 30, "Spend cliff", "June 30 — purchase by"),
             make(7, 31, "Submission cliff", "July 31 — reimbursement deadline")
-        ].compactMap { $0 }
+        ]
+        .compactMap { $0 }
+        .sorted { $0.daysAway < $1.daysAway }
     }
 
     private func nextDeadlineDays() -> Int? {

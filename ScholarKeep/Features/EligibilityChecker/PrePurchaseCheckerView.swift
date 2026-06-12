@@ -59,6 +59,7 @@ struct PrePurchaseCheckerView: View {
             }
             .onAppear {
                 if studentID == nil { studentID = settings.activeStudentID ?? students.first?.id }
+                seedDemoMessagesIfNeeded()
             }
         }
     }
@@ -216,6 +217,17 @@ struct PrePurchaseCheckerView: View {
         "Gas to drive to tutoring",
         "Private school tuition"
     ]
+
+    /// `--demo` mode: pre-fill the conversation with real engine verdicts so
+    /// screenshots/demos show the cited-verdict experience, not an empty state.
+    private func seedDemoMessagesIfNeeded() {
+        guard DemoSeed.isActive, messages.isEmpty else { return }
+        for (query, amount) in [("Magic Kingdom annual pass", "1499"), ("ABA therapy session with BCBA", "180"), ("Chromebook for school", "349")] {
+            input = query
+            amountInput = amount
+            send()
+        }
+    }
 
     private func send() {
         let text = input.trimmingCharacters(in: .whitespacesAndNewlines)
