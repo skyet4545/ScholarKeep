@@ -146,6 +146,41 @@ enum DemoSeed {
         context.insert(evalTask)
         context.insert(receiptsTask)
 
+        // MARK: Receipt inbox
+        let receiptCandidate = ReceiptCandidate(
+            source: .gmail,
+            sourceMessageID: "demo-gmail-receipt-1",
+            sender: "Rainbow Resource Center <orders@rainbowresource.com>",
+            subject: "Your Rainbow Resource receipt",
+            receivedAt: daysAgo(1),
+            snippet: "Order RR-48291 · Total $64.72",
+            bodyText: """
+            Thank you for your order.
+            Order RR-48291
+            Math manipulatives $34.95
+            Science activity kit $25.00
+            Subtotal $59.95
+            Tax $4.77
+            Total $64.72
+            """,
+            suggestedVendor: "Rainbow Resource Center",
+            suggestedPurchaseDate: daysAgo(1),
+            suggestedSubtotal: 59.95,
+            suggestedTax: 4.77,
+            suggestedTotal: 64.72,
+            suggestedLineItems: [
+                ParsedLineItem(descriptionText: "Math manipulatives", amount: 34.95),
+                ParsedLineItem(descriptionText: "Science activity kit", amount: 25.00)
+            ],
+            detectionScore: 8,
+            detectionReasons: [
+                "Subject contains “receipt”",
+                "Contains purchase details",
+                "Contains a currency amount"
+            ]
+        )
+        context.insert(receiptCandidate)
+
         try? context.save()
         settings.activeStudentID = maya.id
     }

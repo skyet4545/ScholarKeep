@@ -48,7 +48,8 @@ struct ScholarKeepApp: App {
             PreAuthorization.self,
             Refund.self,
             BalanceEntry.self,
-            RecurringTask.self
+            RecurringTask.self,
+            ReceiptCandidate.self
         ])
         // v0.7.1: CloudKit sync via the private database. SwiftData syncs
         // automatically when the device is signed in to iCloud. If not

@@ -2,7 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
-    <!-- ScholarKeep is on-device only. No data collection of any kind. -->
+    <!-- Local-first with no developer-operated collection or tracking. Gmail receipt
+         data is fetched to the device; saved records may sync through private CloudKit. -->
     <key>NSPrivacyTracking</key>
     <false/>
     <key>NSPrivacyTrackingDomains</key>

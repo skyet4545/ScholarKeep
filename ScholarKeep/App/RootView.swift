@@ -104,6 +104,12 @@ struct MainTabView: View {
 
 /// v0.5.0: Real hub — 2×2 tile grid for primary destinations + reference list.
 struct MoreMenuView: View {
+    @Query private var receiptCandidates: [ReceiptCandidate]
+
+    private var pendingReceiptCount: Int {
+        receiptCandidates.filter { $0.status == .pending }.count
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -149,6 +155,18 @@ struct MoreMenuView: View {
         VStack(alignment: .leading, spacing: DS.sm) {
             sectionHeader("Records")
             VStack(spacing: 0) {
+                NavigationLink { ReceiptInboxView() } label: {
+                    moreRow(
+                        title: "Receipt Inbox",
+                        subtitle: pendingReceiptCount > 0
+                            ? "\(pendingReceiptCount) waiting for review"
+                            : "Gmail, screenshots, PDFs & shared receipts",
+                        symbol: "tray.full.fill"
+                    )
+                }
+                .buttonStyle(.plain)
+                .accessibilityIdentifier("moreRowReceiptInbox")
+                Divider().padding(.leading, 56)
                 NavigationLink { ExpenseListView() } label: {
                     moreRow(title: "All receipts", symbol: "doc.text.fill")
                 }

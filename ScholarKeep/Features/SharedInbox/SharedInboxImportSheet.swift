@@ -15,6 +15,10 @@ struct SharedInboxImportSheet: View {
 
     @State private var index = 0
     @State private var selectedStudentID: UUID?
+    @State private var parsedReceipt: ParsedReceipt?
+    @State private var parsedOCRText = ""
+    @State private var isReadingReceipt = false
+    @State private var readError: String?
 
     private var current: ShareInbox.PendingShare? {
         guard index < pending.count else { return nil }
@@ -49,6 +53,9 @@ struct SharedInboxImportSheet: View {
                     selectedStudentID = settings.activeStudentID ?? students.first?.id
                 }
             }
+            .task(id: current?.id) {
+                await readCurrentShare()
+            }
         }
     }
 
@@ -69,6 +76,8 @@ struct SharedInboxImportSheet: View {
                 if students.count > 1 {
                     studentPicker
                 }
+
+                receiptDetectionCard
 
                 VStack(spacing: DS.sm) {
                     JournalCTA("Save to ScholarKeep", symbol: "tray.and.arrow.down.fill") {
@@ -96,7 +105,7 @@ struct SharedInboxImportSheet: View {
     private func contentPreview(for share: ShareInbox.PendingShare) -> some View {
         VStack(alignment: .leading, spacing: DS.md) {
             if let attachmentURL = ShareInbox.attachmentURL(for: share),
-               share.kind == .image,
+               attachmentURL.pathExtension.lowercased() != "pdf",
                let image = UIImage(contentsOfFile: attachmentURL.path) {
                 Image(uiImage: image)
                     .resizable()
@@ -104,7 +113,8 @@ struct SharedInboxImportSheet: View {
                     .frame(maxHeight: 280)
                     .frame(maxWidth: .infinity)
                     .clipShape(RoundedRectangle(cornerRadius: 12))
-            } else if share.kind == .pdf {
+            } else if let attachmentURL = ShareInbox.attachmentURL(for: share),
+                      attachmentURL.pathExtension.lowercased() == "pdf" {
                 HStack(spacing: DS.md) {
                     Image(systemName: "doc.fill")
                         .font(.title.weight(.semibold))
@@ -141,6 +151,51 @@ struct SharedInboxImportSheet: View {
         .padding(DS.lg)
         .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
         .shadow(color: Color.black.opacity(0.04), radius: 12, x: 0, y: 4)
+        .padding(.horizontal, DS.lg)
+    }
+
+    @ViewBuilder
+    private var receiptDetectionCard: some View {
+        VStack(alignment: .leading, spacing: DS.sm) {
+            Text("RECEIPT DETAILS")
+                .font(.footnote.weight(.semibold))
+                .foregroundStyle(.secondary)
+                .tracking(0.5)
+            if isReadingReceipt {
+                HStack(spacing: DS.sm) {
+                    ProgressView()
+                    Text("Reading receipt on this device…")
+                        .font(.subheadline)
+                        .foregroundStyle(.secondary)
+                }
+            } else if let parsedReceipt {
+                VStack(alignment: .leading, spacing: 6) {
+                    if !parsedReceipt.vendorName.isEmpty {
+                        LabeledContent("Vendor", value: parsedReceipt.vendorName)
+                    }
+                    if let date = parsedReceipt.purchaseDate {
+                        LabeledContent("Purchase date", value: date.formatted(date: .abbreviated, time: .omitted))
+                    }
+                    if let total = parsedReceipt.total {
+                        LabeledContent("Total", value: total.formatted(.currency(code: "USD")))
+                    }
+                    if !parsedReceipt.lineItems.isEmpty {
+                        LabeledContent("Line items", value: "\(parsedReceipt.lineItems.count)")
+                    }
+                }
+                .font(.subheadline)
+            } else if let readError {
+                Label(readError, systemImage: "exclamationmark.triangle")
+                    .font(.footnote)
+                    .foregroundStyle(DS.statusWarn)
+            } else {
+                Text("ScholarKeep will preserve this item for manual review.")
+                    .font(.footnote)
+                    .foregroundStyle(.secondary)
+            }
+        }
+        .padding(DS.lg)
+        .background(DS.grouped, in: RoundedRectangle(cornerRadius: DS.cardRadius))
         .padding(.horizontal, DS.lg)
     }
 
@@ -214,19 +269,18 @@ struct SharedInboxImportSheet: View {
             return
         }
 
-        // Build a minimal expense from the share. The user will refine
-        // it in the Expense detail screen after this sheet closes.
         let summary = (share.text ?? "").trimmingCharacters(in: .whitespacesAndNewlines)
         let firstLine = summary.split(separator: "\n").first.map(String.init) ?? "Shared receipt"
-        let vendor = String(firstLine.prefix(80))
+        let detectedVendor = parsedReceipt?.vendorName.trimmingCharacters(in: .whitespacesAndNewlines) ?? ""
+        let vendor = detectedVendor.isEmpty ? String(firstLine.prefix(80)) : detectedVendor
 
         let expense = Expense(
             vendorName: vendor.isEmpty ? "Shared receipt" : vendor,
-            purchaseDate: share.createdAt,
-            subtotal: 0,
-            tax: 0,
+            purchaseDate: parsedReceipt?.purchaseDate ?? share.createdAt,
+            subtotal: parsedReceipt?.subtotal ?? 0,
+            tax: parsedReceipt?.tax ?? 0,
             shipping: 0,
-            total: 0,
+            total: parsedReceipt?.total ?? 0,
             currency: "USD",
             categoryKey: nil,
             subcategory: "",
@@ -241,17 +295,26 @@ struct SharedInboxImportSheet: View {
         }
 
         modelContext.insert(expense)
+        expense.lineItems = (parsedReceipt?.lineItems ?? []).map {
+            LineItem(descriptionText: $0.descriptionText, unitPrice: $0.amount, amount: $0.amount)
+        }
+        var checklist = ReadinessChecklist()
+        checklist.itemizedReceipt = !(parsedReceipt?.lineItems.isEmpty ?? true)
+        checklist.noHandwrittenAlterations = true
+        expense.readinessChecklist = checklist
 
         // Attach the image/PDF if any.
         if let attachmentURL = ShareInbox.attachmentURL(for: share),
            let data = try? Data(contentsOf: attachmentURL) {
-            let ext = attachmentURL.pathExtension.lowercased()
+            let mime = ReceiptDocumentReader.inferredMimeType(for: attachmentURL)
             let attachment = Attachment(
                 type: .receipt,
-                mimeType: ext == "pdf" ? "application/pdf" : "image/jpeg",
+                mimeType: mime,
                 fileData: data,
+                ocrText: parsedOCRText,
                 expense: expense
             )
+            expense.attachments = [attachment]
             modelContext.insert(attachment)
         }
 
@@ -266,10 +329,51 @@ struct SharedInboxImportSheet: View {
     }
 
     private func advance() {
+        parsedReceipt = nil
+        parsedOCRText = ""
+        readError = nil
         if index < pending.count - 1 {
             index += 1
         } else {
             index = pending.count
         }
+    }
+
+    @MainActor
+    private func readCurrentShare() async {
+        guard let share = current else { return }
+        parsedReceipt = nil
+        parsedOCRText = ""
+        readError = nil
+
+        if let attachmentURL = ShareInbox.attachmentURL(for: share),
+           let data = try? Data(contentsOf: attachmentURL) {
+            isReadingReceipt = true
+            defer { isReadingReceipt = false }
+            do {
+                let result = try await ReceiptDocumentReader.read(
+                    data: data,
+                    mimeType: ReceiptDocumentReader.inferredMimeType(for: attachmentURL)
+                )
+                guard current?.id == share.id else { return }
+                parsedReceipt = result.parsed
+                parsedOCRText = result.ocrText
+            } catch {
+                readError = "The file was saved, but its details could not be read automatically."
+            }
+            return
+        }
+
+        guard let text = share.text, !text.isEmpty else { return }
+        let amounts = EmailReceiptDetector.inferredAmounts(from: text)
+        var parsed = ParsedReceipt()
+        parsed.vendorName = text.split(separator: "\n").first.map(String.init) ?? "Shared receipt"
+        parsed.purchaseDate = EmailReceiptDetector.inferredDate(from: text)
+        parsed.subtotal = amounts.subtotal
+        parsed.tax = amounts.tax
+        parsed.total = amounts.total
+        parsed.rawText = text
+        parsedReceipt = parsed
+        parsedOCRText = text
     }
 }

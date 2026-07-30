@@ -19,54 +19,59 @@
   <body>
     <p class="back"><a href="/">← ScholarKeep</a></p>
     <h1>Privacy Policy</h1>
-    <p class="meta">Effective: May 23, 2026 · Last updated: May 23, 2026</p>
+    <p class="meta">Effective: May 23, 2026 · Last updated: July 30, 2026</p>
 
     <p>This Privacy Policy explains what data the ScholarKeep mobile application ("ScholarKeep", "the app", "we", "us") collects, stores, and shares. ScholarKeep is operated by Carlos Reyes as an independent iOS application available through the Apple App Store.</p>
 
-    <blockquote><strong>Plain English.</strong> Everything you put in ScholarKeep stays on your phone. We do not have servers that hold your data. We do not sell, share, rent, or transmit your records to anyone. Sign in with Apple is used only to lock the app to your Apple ID; the Apple identifier never leaves your device. If you turn on iCloud backup, the data syncs through your own iCloud account.</blockquote>
+    <blockquote><strong>Plain English.</strong> ScholarKeep is local-first. We do not operate servers that hold your records, sell your data, or use it for advertising. If you optionally connect Gmail, ScholarKeep receives read-only access through Google and searches for likely receipts on your device. Imported records may sync through your private iCloud account.</blockquote>
 
     <h2>1. What we do NOT collect</h2>
     <p>ScholarKeep does not collect or transmit usage analytics, does not include third-party SDKs that collect data, does not track you across other apps, does not send your records to any server we operate (we don't operate any), does not sell or share information, and does not use your data for advertising.</p>
 
     <h2>2. What ScholarKeep stores locally on your device</h2>
-    <p>Student profiles, expenses, receipts, line items, attachments, providers, pre-authorizations, refunds, balance ledger entries, claims, status history. All stored exclusively in the app's private container.</p>
+    <p>Student profiles, expenses, receipts, line items, attachments, providers, pre-authorizations, refunds, balance ledger entries, claims, status history, and possible receipts found through an optional Gmail connection. Records are stored in the app's private container and may sync through your private iCloud account.</p>
 
     <h2>3. Sign in with Apple</h2>
     <p>Used to gate access. Apple shares a stable identifier (unique to ScholarKeep + your Apple ID) which is stored locally. The identifier never leaves your device. Apple's own privacy practices apply to the sign-in flow itself.</p>
 
-    <h2>4. Subscriptions (StoreKit 2)</h2>
+    <h2>4. Optional Gmail receipt import</h2>
+    <p>If you connect Gmail, ScholarKeep uses Google's authorization screen and requests read-only Gmail access. We never receive your Google password. ScholarKeep cannot send, delete, archive, label, or modify email.</p>
+    <p>Likely receipt messages and image/PDF attachments are downloaded directly from Google to your device and analyzed there. OAuth tokens are stored in the iOS Keychain and are not stored in SwiftData or iCloud. You can disconnect in ScholarKeep or revoke access through your Google Account. Gmail data is not sold, used for advertising, or used to train a generalized AI model.</p>
+
+    <h2>5. Subscriptions (StoreKit 2)</h2>
     <p>Pro is delivered as an in-app subscription processed by Apple. Apple handles payment, taxation, and billing. The app checks subscription entitlement on-device. Apple collects payment info under Apple's terms; we do not.</p>
 
-    <h2>5. On-device OCR (Apple Vision)</h2>
+    <h2>6. On-device OCR (Apple Vision)</h2>
     <p>When you scan a receipt, Apple Vision extracts text on the device itself. The receipt image is not transmitted off the device.</p>
 
-    <h2>6. Notifications</h2>
+    <h2>7. Notifications</h2>
     <p>Local notifications only — scheduled by iOS on your device for deadlines and on-hold clocks. No remote push.</p>
 
-    <h2>7. Optional iCloud backup (off by default)</h2>
-    <p>If you enable iCloud backup in Settings, your records sync through your personal iCloud account using Apple CloudKit. Encrypted in transit by Apple, stored under your Apple ID. Disabling the toggle stops further sync.</p>
+    <h2>8. iCloud sync</h2>
+    <p>ScholarKeep records sync through your personal iCloud account using Apple's private CloudKit database when available. Gmail OAuth tokens do not sync through CloudKit.</p>
 
-    <h2>8. Diagnostics (MetricKit)</h2>
+    <h2>9. Diagnostics (MetricKit)</h2>
     <p>iOS may share aggregated and anonymized performance metrics via Apple's MetricKit framework. These payloads do not contain your records and are written to a local diagnostics folder. We do not transmit them.</p>
 
-    <h2>9. Children's privacy</h2>
+    <h2>10. Children's privacy</h2>
     <p>ScholarKeep is designed for parents and guardians. Not intended for use by children. We do not knowingly collect personal information from children under 13.</p>
 
-    <h2>10. Your rights</h2>
+    <h2>11. Your choices and rights</h2>
     <ul>
       <li><strong>Access and export:</strong> Settings → Export all expenses (CSV).</li>
       <li><strong>Deletion:</strong> Settings → Delete all data on this device.</li>
       <li><strong>Sign-out:</strong> Settings → Account → Sign out.</li>
+      <li><strong>Disconnect Gmail:</strong> Receipt Inbox → Disconnect Gmail, or revoke access through your Google Account.</li>
       <li><strong>App removal:</strong> Deleting the app from iOS removes all locally-stored data.</li>
     </ul>
 
-    <h2>11. Third-party services we do not use</h2>
-    <p>ScholarKeep does NOT integrate with Google Analytics, Firebase Analytics, Mixpanel, Facebook, TikTok, Sentry, Bugsnag, Crashlytics, or any analytics, advertising, or crash-reporting service. ScholarKeep does NOT interact with Step Up For Students, AAA Scholarship Foundation, EMA, SMP, MyScholarShop, Tipalti, FLDOE, or any state of Florida system.</p>
+    <h2>12. Other services we do not use</h2>
+    <p>ScholarKeep does NOT integrate with Google Analytics, Firebase Analytics, Mixpanel, Facebook, TikTok, Sentry, Bugsnag, Crashlytics, or any analytics, advertising, or crash-reporting service. Optional Google Gmail access is limited to the receipt feature described above. ScholarKeep does NOT interact with Step Up For Students, AAA Scholarship Foundation, EMA, SMP, MyScholarShop, Tipalti, FLDOE, or any state of Florida system.</p>
 
-    <h2>12. Changes</h2>
+    <h2>13. Changes</h2>
     <p>We may update this policy when we change how the app handles data. Material changes will be highlighted in the next app release notes.</p>
 
-    <h2>13. Contact</h2>
+    <h2>14. Contact</h2>
     <p>Questions: <a href="mailto:carlos.reyesiii@gmail.com">carlos.reyesiii@gmail.com</a></p>
   </body>
 </html>

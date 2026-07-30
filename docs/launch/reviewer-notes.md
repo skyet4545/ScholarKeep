@@ -17,6 +17,13 @@ email receipts. To test: open Safari or Photos, tap Share on any image or
 web page, select "ScholarKeep" from the share sheet, then return to the app —
 an import review sheet appears on next foreground.
 
+OPTIONAL GMAIL IMPORT: More → Receipt Inbox contains the optional Gmail
+connection. It requests read-only Gmail access solely to find likely receipts
+and invoices. It cannot send, delete, archive, label, or otherwise modify mail.
+Messages are processed on-device and require parent review before import. The
+feature remains disabled when this review build has no approved Google OAuth
+test credential; camera, Photos, Files, and Share remain fully testable.
+
 SUBSCRIPTIONS: Pro Monthly ($4.99) and Pro Yearly ($39.99) unlock PDF export,
 CSV export, and year-end summaries. The free tier is fully functional for
 eligibility checks, receipt tracking, claims, and reminders. Note: builds
@@ -24,10 +31,11 @@ installed before our public launch date include a complimentary "Beta
 Founder" Pro entitlement — this is intentional (a thank-you to beta testers),
 implemented locally via first-launch date, not a server flag.
 
-PRIVACY: all data is stored on-device (SwiftData) and syncs only through the
-user's own iCloud account via CloudKit private database. We operate no
-servers and collect no data ("Data Not Collected" privacy label). Sign in
-with Apple appears only as an OPTIONAL item in Settings → Account.
+PRIVACY: records are stored on-device (SwiftData) and sync only through the
+user's own iCloud account via a CloudKit private database. We operate no
+records or email-processing server. Gmail OAuth tokens remain in the iOS
+Keychain and are excluded from SwiftData/iCloud. Sign in with Apple appears
+only as an OPTIONAL item in Settings → Account.
 
 NOT AFFILIATED with Step Up For Students, AAA Scholarship Foundation, or the
 Florida DOE — the app states this prominently in onboarding, Settings, and
@@ -42,6 +50,7 @@ Welcome to ScholarKeep 1.0 — built by two Florida homeschool dads for their
 own families, now ready for yours.
 
 • Scan receipts in one tap (or forward them from Mail)
+• Optionally connect Gmail to find likely receipts automatically
 • Check eligibility instantly, with the official Purchasing Guide line cited
 • Track every claim from draft to paid
 • Export submission-ready PDFs before the July 31 deadline
