@@ -1,6 +1,6 @@
 # App Store Connect release checklist
 
-ScholarKeep 0.8.0 (build 16) adds an optional Gmail Receipt Inbox and improves
+ScholarKeep 0.8.0 (build 17) adds an optional Gmail Receipt Inbox and improves
 image/PDF receipt capture. The app remains useful without connecting Gmail.
 
 ## Before archiving
@@ -22,7 +22,7 @@ image/PDF receipt capture. The app remains useful without connecting Gmail.
 ## App Store Connect metadata
 
 - Version: `0.8.0`
-- Build: `16`
+- Build: `17`
 - Suggested subtitle: `Receipts organized for reimbursement`
 - Suggested What’s New:
 
