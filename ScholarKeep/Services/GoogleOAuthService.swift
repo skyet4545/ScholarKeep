@@ -52,8 +52,8 @@ final class GoogleOAuthService: NSObject {
     private let keychainService = "com.carlosreyes.scholarkeep.google-oauth"
     private let keychainAccount = "gmail"
     private let accountEmailKey = "gmail.connectedEmail"
-    private let redirectURI = "com.carlosreyes.scholarkeep:/oauth2redirect"
-    private let callbackScheme = "com.carlosreyes.scholarkeep"
+    private let redirectURI = "com.googleusercontent.apps.277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9:/oauth2redirect"
+    private let callbackScheme = "com.googleusercontent.apps.277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9"
     private let scope = "https://www.googleapis.com/auth/gmail.readonly"
 
     private var webSession: ASWebAuthenticationSession?

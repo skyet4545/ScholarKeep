@@ -29,7 +29,7 @@
             <string>Google OAuth callback</string>
             <key>CFBundleURLSchemes</key>
             <array>
-                <string>com.carlosreyes.scholarkeep</string>
+                <string>com.googleusercontent.apps.277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9</string>
             </array>
         </dict>
     </array>

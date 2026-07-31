@@ -1,39 +1,45 @@
 # Google OAuth and Console Setup
 
-The feature compiles and the rest of ScholarKeep remains usable without a
-Google credential. Gmail connection is disabled until the configuration below
-is completed.
+ScholarKeep is configured with its public iOS OAuth client. Gmail connection
+remains limited to explicit test users until the Google consent screen is ready
+for production.
 
 ## Google Cloud
 
-1. Create or select a Google Cloud project owned by the ScholarKeep publisher.
-2. Enable the Gmail API.
-3. Configure the OAuth consent screen:
+1. Google Cloud project: `ScholarKeep` (`scholarkeep-receipts`).
+2. Gmail API: enabled.
+3. OAuth consent screen:
    - App name: `ScholarKeep`
    - Support email: the published ScholarKeep support address
    - Audience: External
    - Scope: `https://www.googleapis.com/auth/gmail.readonly`
-4. Add the verified production homepage, privacy policy, and terms URLs.
-5. Create an OAuth client:
+4. Before production verification, add the verified production homepage,
+   privacy policy, and terms URLs.
+5. iOS OAuth client: `ScholarKeep iOS`
    - Application type: iOS
    - Bundle ID: `com.carlosreyes.scholarkeep`
-6. Submit the production app for Google's restricted-scope verification.
+   - Team ID: `846N5D6TMK`
+   - Client ID: `277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9.apps.googleusercontent.com`
+6. Before public release, submit the app for Google's restricted-scope
+   verification.
 
 ## Xcode configuration
 
 Set the generated Info.plist value:
 
 ```text
-SCHOLARKEEP_GOOGLE_CLIENT_ID = <ios-client-id>.apps.googleusercontent.com
+SCHOLARKEEP_GOOGLE_CLIENT_ID = 277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9.apps.googleusercontent.com
 ```
 
 The registered callback is:
 
 ```text
-com.carlosreyes.scholarkeep:/oauth2redirect
+com.googleusercontent.apps.277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9:/oauth2redirect
 ```
 
-The URL scheme `com.carlosreyes.scholarkeep` is declared by the app target.
+The reversed-client-ID URL scheme
+`com.googleusercontent.apps.277822482276-g1pjqj5i0j5da69jnrt1pu2u2d8iq7v9`
+is declared by the app target.
 
 Do not commit refresh tokens, access tokens, downloaded OAuth JSON files, or a
 client secret. An installed iOS OAuth client is public by design and does not

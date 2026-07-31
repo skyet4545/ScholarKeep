@@ -5,11 +5,12 @@ image/PDF receipt capture. The app remains useful without connecting Gmail.
 
 ## Before archiving
 
-- Create an iOS OAuth client for ScholarKeep in Google Cloud.
-- Register `com.carlosreyes.scholarkeep:/oauth2redirect`.
-- Put the client ID in the release build setting
-  `SCHOLARKEEP_GOOGLE_CLIENT_ID`. Never commit a client secret; an installed
-  iOS app cannot keep one confidential.
+- Confirm the `ScholarKeep iOS` OAuth client remains registered to bundle ID
+  `com.carlosreyes.scholarkeep` and Team ID `846N5D6TMK`.
+- Confirm the reversed-client-ID callback scheme remains registered in the app.
+- Confirm the public iOS client ID remains in the release build setting
+  `SCHOLARKEEP_GOOGLE_CLIENT_ID`. Never add a client secret; an installed iOS
+  app cannot keep one confidential.
 - Complete the OAuth consent screen, authorize only
   `https://www.googleapis.com/auth/gmail.readonly`, and complete any Google
   verification required for production users.
