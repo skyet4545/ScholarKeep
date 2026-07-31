@@ -3,6 +3,21 @@
 ScholarKeep 0.8.0 (build 17) adds an optional Gmail Receipt Inbox and improves
 image/PDF receipt capture. The app remains useful without connecting Gmail.
 
+## TestFlight build 17 evidence
+
+- Uploaded successfully to App Store Connect on July 31, 2026.
+- TestFlight build ID: `c55db31d-7676-4227-9528-869048188e42`.
+- Status: Testing; expires in 90 days.
+- Internal groups: `Carlos (internal)`, `Guys`, and `Reyes Family`.
+- Test notes describe Gmail connection, bounded receipt scanning, candidate
+  review, draft creation, image/PDF capture, OCR, reconnection, and regression
+  checks.
+- Google OAuth test access includes `carlos.reyesiii@gmail.com`.
+- CloudKit development and production currently expose only the built-in
+  `Users` record type and no deployable schema changes. Validate real-device
+  persistence and initialize/deploy the SwiftData record schema before any
+  public App Store submission.
+
 ## Before archiving
 
 - Confirm the `ScholarKeep iOS` OAuth client remains registered to bundle ID
